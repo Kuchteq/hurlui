@@ -1,0 +1,5 @@
+#!/bin/sh
+
+nvim --server "/tmp/dupxo" --remote-send "<cmd>lua prepareForIncomingFile()<CR>"
+nvim --server "/tmp/dupxo" --remote $1 
+
