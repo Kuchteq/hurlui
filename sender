@@ -1,5 +1,15 @@
 #!/bin/sh
 
-nvim --server "/tmp/dupxo" --remote-send "<cmd>lua prepareForIncomingFile()<CR>"
-nvim --server "/tmp/dupxo" --remote $1 
+# shared code
+BASENAME="${1##*/}" 
+BASENAME="${BASENAME%.*}"
+DESTFOLDER="$OUTPUTBASE/$BASENAME"
 
+[ -d  "$DESTFOLDER" ] && LATEST_FILE="$DESTFOLDER/$(ls "$DESTFOLDER" -t | head -n1)"
+if [ -f "$LATEST_FILE" ]; then    
+    nvim --server $LISTEN_ADDRESS --remote-send "<cmd>lua prepareOutput()<CR>"
+    nvim --server $LISTEN_ADDRESS --remote $LATEST_FILE
+fi
+
+nvim --server $LISTEN_ADDRESS --remote-send "<cmd>lua prepareEditor()<CR>"
+nvim --server $LISTEN_ADDRESS --remote $1

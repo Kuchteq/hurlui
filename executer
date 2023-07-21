@@ -1,0 +1,20 @@
+#!/bin/sh
+
+OUTPUT=$(hurl $1 2>&1)
+EXTENSION=$(echo "$OUTPUT" | file --mime-type -b - | sed 's/.*\///')
+
+# shared code
+BASENAME="${1##*/}" 
+BASENAME="${BASENAME%.*}"
+DESTFOLDER="$OUTPUTBASE/$BASENAME"
+
+[ ! -d  "$DESTFOLDER" ] && mkdir "$DESTFOLDER"
+DEST="$DESTFOLDER/$(date +%H:%M:%SD%d-%m-%Y).$EXTENSION"
+
+
+if [ $EXTENSION = "json" ]; then
+    echo "$OUTPUT" | jq . > "$DEST" 
+else
+    echo "$OUTPUT" > "$DEST"
+fi
+echo -n "$DEST"

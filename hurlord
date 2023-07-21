@@ -1,0 +1,11 @@
+#!/bin/sh
+
+export LISTEN_ADDRESS="/tmp/hurlordSocket$RANDOM"
+export HURLORD_HOME=$(dirname $(readlink "$0"))
+export PATH="$HURLORD_HOME:$PATH"
+export NNN_OPENER="$HURLORD_HOME/sender"
+export EDITOR="$HURLORD_HOME/sender"
+export OUTPUTBASE="/tmp/hurlord"
+[ ! -d "$OUTPUTBASE" ] && mkdir "$OUTPUTBASE"
+
+foot -o "font=Hack:pixelsize=30" nvim -u $XDG_CONFIG_HOME/hurlord/init.lua --listen $LISTEN_ADDRESS $@
