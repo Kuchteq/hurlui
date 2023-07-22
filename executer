@@ -1,5 +1,5 @@
 #!/bin/sh
-
+[ ! -s $1 ] && exit 1
 OUTPUT=$(hurl $1 2>&1)
 EXTENSION=$(echo "$OUTPUT" | file --mime-type -b - | sed 's/.*\///')
 

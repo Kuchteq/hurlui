@@ -8,4 +8,4 @@ export EDITOR="$HURLORD_HOME/sender"
 export OUTPUTBASE="/tmp/hurlord"
 [ ! -d "$OUTPUTBASE" ] && mkdir "$OUTPUTBASE"
 
-foot -o "font=Hack:pixelsize=30" nvim -u $XDG_CONFIG_HOME/hurlord/init.lua --listen $LISTEN_ADDRESS $@
+foot -o "font=Hack:pixelsize=30" nvim -u $HURLORD_HOME/init.lua --listen $LISTEN_ADDRESS $@

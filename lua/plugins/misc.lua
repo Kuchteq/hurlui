@@ -37,7 +37,7 @@ return {
                 }
             )
             require('telescope').load_extension("workspaces")
-            require("telescope").extensions.workspaces.workspaces()
+--            require("telescope").extensions.workspaces.workspaces()
         end
     }
 
