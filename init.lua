@@ -1,15 +1,18 @@
--- CODE RELATED TO SEPERATING HURLORD FROM REGULAR NVIM
+P = function(a) -- debugging print
+    print(vim.inspect(a))
+end
+-- CODE RELATED TO SEPERATING HURLUI FROM REGULAR NVIM
 local old_stdpath = vim.fn.stdpath
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.fn.stdpath = function(value)
     if value == "data" then
-        return vim.env.XDG_DATA_HOME .. "/hurlord"
+        return vim.env.XDG_DATA_HOME .. "/hurlui"
     end
     if value == "cache" then
-        return vim.env.XDG_CACHE_HOME .. "/hurlord"
+        return vim.env.XDG_CACHE_HOME .. "/hurlui"
     end
     if value == "config" then
-        return vim.env.HURLORD_HOME
+        return vim.env.HURLUI_HOME
     end
     return old_stdpath(value)
 end
@@ -21,6 +24,8 @@ vim.opt.packpath:append(vim.fn.stdpath('data') .. '/packages')
 -- Globals
 DEFAULT_ENVSPACE_NAME = vim.env.DEFAULT_ENVSPACE_NAME
 require('utils')
+require("theme")
+require("request_explorer")
 
 -- SET UP LAZY PACKAGE MANAGER
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -29,6 +34,9 @@ vim.opt.rtp:prepend(lazypath)
 
 --MISC SETTINGS
 vim.g.mapleader = ' '
+vim.o.title = true
+vim.o.cursorline = true
+vim.o.titlestring = 'Hurlui'
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 vim.o.noshowcmd = 1
@@ -41,12 +49,13 @@ vim.o.clipboard = "unnamedplus"
 vim.opt.cmdheight = 0
 vim.opt.termguicolors = true
 vim.o.laststatus = 2
-vim.opt.statusline = "%= %f %="                                    -- Center the bottom status line
+vim.opt.statusline = "%= %{expand('%:~:.')} %="                    -- Center the bottom status line
 vim.opt.undodir = { vim.fn.stdpath('cache') .. "/hurly/.undodir" } -- set up undodir
 vim.opt.undofile = true
 
 
 local blankBufId = vim.api.nvim_create_buf(true, true);
+local initial_cursor_shape = vim.o.guicursor;
 
 -- Though creating three variables that are very similar may seem like a redundancy for now
 -- But this is just leaving the room for future improvements and side effect callbacks
@@ -55,6 +64,7 @@ local Editor = {
     win_close = function(self)
         vim.api.nvim_win_close(self, true)
     end,
+    current_req_name = nil;
     win_set_width = function(self, width)
         vim.api.nvim_win_set_width(self.win_id, math.floor(width))
     end,
@@ -62,6 +72,8 @@ local Editor = {
         Tabs.runner:enter()
         self:win_set_focus();
         vim.cmd.edit(requestFilePath);
+        self.current_req_name = trunc_extension(vim.fn.expand('%:~:.'))
+        vim.api.nvim_win_set_option(self.win_id, "statusline", "%= Editor — " .. self.current_req_name  .. "%=")
     end,
     get_current_file_buf_id = function(self)
         return vim.api.nvim_win_get_buf(self.win_id)
@@ -107,27 +119,10 @@ local Output = {
         else
             Tabs.runner.status:update("")
         end
+        vim.api.nvim_win_set_option(self.win_id, "statusline", "%= ".. Editor.current_req_name .." at %t %=")
     end
 }
 
-local Picker = {
-    win_id = nil,
-    win_close = function(self)
-        vim.api.nvim_win_close(self, true)
-    end,
-    win_set_focus = function(self)
-        --vim.cmd.startinsert();
-        vim.api.nvim_set_current_win(self.win_id)
-    end,
-    win_set_width = function(self, width)
-        vim.api.nvim_win_set_width(self.win_id, math.floor(width))
-    end,
-    init = function(self)
-        self.win_id = vim.api.nvim_get_current_win();
-        vim.cmd.terminal({ "nnn" });
-        vim.cmd.file("picker");
-    end
-}
 
 local EnvEditorFactory = {
     win_id = nil,
@@ -192,7 +187,7 @@ Tabs = {
             Editor:win_set_focus();
         end,
         run_hurl = function()
-            vim.cmd("silent write")
+            vim.api.nvim_command('silent! update')
             local hurl_file_path = Editor:get_current_file_path()
             local appended_env_path = Tabs.env.selected and "'" .. Tabs.env.selected .. "'" or "";
             vim.fn.system("executer '" .. hurl_file_path .. "' " .. appended_env_path)
@@ -225,6 +220,7 @@ Tabs = {
                 vim.keymap.set("n", "<leader>a", function()
                     Tabs.env:alternate();
                 end);
+
                 vim.keymap.set("n", "<enter>", function()
                     if TabsController.current_tab == 1 then
                         self:run_hurl();
@@ -232,7 +228,7 @@ Tabs = {
                         Tabs.env:select(vim.api.nvim_buf_get_name(0));
                         Tabs.env:buf_labels_refresh();
                     end
-                end);
+                end, {silent=true});
                 vim.keymap.set({ "n", "t" }, "<Tab>", function() TabsController:shift() end);
                 -- unfortunately these need to be wrapped with anonymous(anoyingmous)
                 -- functions because we are accessing self inside the function
@@ -311,7 +307,7 @@ Tabs = {
                 local title = "%= %t %=";
                 if get_file_name(editor:get_current_file_path()) == get_file_name(self.selected) then
                     title = "%= selected: %t %=";
-                elseif  self.alternator and get_file_name(editor:get_current_file_path()) == get_file_name(self.alternator) then
+                elseif self.alternator and get_file_name(editor:get_current_file_path()) == get_file_name(self.alternator) then
                     title = "%= alternative: %t %=";
                 end
                 vim.api.nvim_win_set_option(editor.win_id, "statusline", title)
@@ -359,10 +355,21 @@ TabsController = {
 
 -- AUTOCMDS
 -- Makes sure that the user is able to choose the request straight away
-vim.api.nvim_create_autocmd({ "VimEnter", "TermEnter", "TermOpen", "WinEnter" }, {
+vim.api.nvim_create_autocmd({ "WinEnter" }, {
+    callback = function()
+        Picker.hide_cursor()
+    end
+})
+-- autosave
+vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertLeave" }, {
+  callback = function()
+      vim.api.nvim_command('silent update')
+  end,
+})
+vim.api.nvim_create_autocmd({ "WinLeave" }, {
     callback = function()
         if Picker.win_id == vim.api.nvim_get_current_win() then
-            vim.cmd.startinsert();
+            vim.o.guicursor = initial_cursor_shape;
         end
     end
 })
@@ -391,10 +398,5 @@ Tabs.env:rescan()
 Tabs.env:set_default_selected()
 
 
-P = function(a) -- debugging print
-    print(vim.inspect(a))
-end
-
 vim.go.tabline = "%!v:lua.TABLINE_UPDATE()"
 require("lazy").setup("plugins")
-require("theme")

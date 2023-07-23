@@ -5,6 +5,10 @@ end
 function get_file_name(file)
       return file:match("^.+/(.+)$")
 end
+function trunc_extension(file)
+    local without = file:match("(.+)%..+$")
+    if without then return without else return file end;
+end
 
 function contains_substring_in_table(tbl, substring)
     for _, str in ipairs(tbl) do

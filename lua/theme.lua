@@ -3,6 +3,37 @@ local background = "NONE"
 
 
 local palette_light = {
+    color0 = '#5C6773',
+    color1 = '#DE2C35',
+    color2 = '#389923',
+    color3 = '#E96A05',
+    color4 = '#2071ae',
+    color5 = '#ca4deb',
+    color6 = '#309f9f',
+    color7 = '#343635',
+    color8 = '#2d3437',
+    color9 = '#8f1212',
+    color10 = '#4CBF99',
+    color11 = '#96740c',
+    color12 = '#49799d',
+    color13 = '#A37ACC',
+    color14 = '#438496',
+    color15 = '#bdc3c2',
+    comment = '#5c6164',
+    contrast = '#161d1f',
+    background = '#ffffff',
+    foreground = '#000000',
+    cursorline = '#dfe3e3',
+    ogpurple = "#ff00d7",
+    baraccent = "#8C1F8C",
+    barinactive = "#0F5C7A",
+    none = 'NONE',
+    bar = '#E7E8EB',
+    barfg = "#ffffff",
+    picker_cursor_line = "#FFDAFF"
+}
+
+local palette_dark = {
     color0 = '#525E5E',
     color1 = '#e57474',
     color2 = '#8ccf7e',
@@ -28,9 +59,16 @@ local palette_light = {
     baraccent = "#8C1F8C",
     barinactive = "#0F5C7A",
     none = 'NONE',
-    bar = 'NONE',
+    bar = '#141b1e',
+    picker_cursor_line = "#3E003E"
 }
-local p = palette_light
+local p = palette_dark
+local light = false
+-- Detect theme mode based on GTK settings, which are sadly present on everyone's computer
+if string.find(vim.fn.system("gsettings get org.gnome.desktop.interface color-scheme"),"light") then
+    p = palette_light
+    light = true
+end
 
 local theme = {
     -- base highlights
@@ -41,7 +79,7 @@ local theme = {
     Conceal = { fg = p.color4, bg = background },
     Conditional = { fg = p.color6 },
     Constant = { fg = p.color5 },
-    Cursor = { fg = p.foreground, bg = p.foreground },
+    Cursor = { fg = p.foreground, bg = p.foreground, blend=100},
     CursorColumn = { bg = background },
     CursorIM = { fg = p.foreground, bg = p.foreground },
     CursorLine = { bg = p.cursorline },
@@ -102,16 +140,16 @@ local theme = {
     SpellLocal = { fg = p.color4 },
     SpellRare = { fg = p.color6 },
     Statement = { fg = p.color6 },
-    StatusLine = { fg = p.foreground, bg = p.baraccent },
-    StatusLineNC = { bg = p.barinactive, fg = p.foreground },
+    StatusLine = { fg = light and p.barfg or p.foreground , bg = p.baraccent },
+    StatusLineNC = { fg = light and p.barfg or p.foreground , bg = p.barinactive },
     Storage = { fg = p.color9 },
     StorageClass = { fg = p.color7 },
     String = { fg = p.color2 },
     Structure = { fg = p.color6 },
     Substitute = { fg = p.color3, bg = p.color6 },
     TabLine = { fg = p.foreground, bg = p.barinactive },
-    TabLineFill = { fg = p.foreground, bg = p.background },
-    TabLineSel = { fg = p.foreground, bg = p.baraccent },
+    TabLineFill = { fg = p.foreground, bg = p.bar },
+    TabLineSel = { fg = light and p.barfg or p.foreground, bg = p.baraccent },
     Tag = { fg = p.color4 },
     TermCursor = { fg = p.foreground, bg = p.foreground },
     TermCursorNC = { fg = p.foreground, bg = p.foreground },
@@ -264,9 +302,10 @@ end
 ENV_EDITOR_NS = vim.api.nvim_create_namespace("env_editor_ns");
 vim.api.nvim_set_hl(ENV_EDITOR_NS, "StatusLineNC", { bg = p.color1, fg = p.background })
 vim.api.nvim_set_hl(ENV_EDITOR_NS, "StatusLine", { bg = p.color3, fg = p.background })
-vim.api.nvim_set_hl(ENV_EDITOR_NS, "StatusLine", { bg = p.color3, fg = p.background })
 vim.api.nvim_set_hl(ENV_EDITOR_NS, "WinSeparator", { bg = background, fg = p.color1 })
 
+PICKER_NS = vim.api.nvim_create_namespace("picker_ns"); 
+vim.api.nvim_set_hl(PICKER_NS, "CursorLine", { bg = p.picker_cursor_line, })
 
 for group, color in pairs(theme) do
     setHl(group, color)
