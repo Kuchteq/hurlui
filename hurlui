@@ -9,8 +9,6 @@ export DEFAULT_ENVSPACE_NAME="dev" # CHANGE THIS if you want your queries to be 
 export HURLUI_HOME=$(dirname $(readlink "$0")) 
 export PATH="$HURLUI_HOME:$PATH"
 export LISTEN_ADDRESS="/tmp/hurluiSocket$RANDOM" 
-export NNN_OPENER="$HURLUI_HOME/sender"
-export EDITOR="$HURLUI_HOME/sender"
 
 [ ! -d "$OUTPUT_BASE" ] && mkdir "$OUTPUT_BASE"
 # [ ! -d "$PWD/.envs" ] && mkdir "$PWD/.envs"

@@ -2,8 +2,11 @@ diricon = "  "
 fileicon = "|"
 
 local create_item = function(type, name)
-    local firstLine = io.open(name):read();
-    local method = firstLine and vim.split(firstLine, " ")[1] or "";
+    local method
+    if type == "file" then
+        local firstLine = io.open(name):read();
+        method = firstLine and vim.split(firstLine, " ")[1] or "";
+    end
     return {
         type = type,
         name = name,
@@ -54,7 +57,9 @@ Picker = {
             while true do
                 local name, item_type = vim.loop.fs_scandir_next(dir_handle)
                 if not name then break end
-                table.insert(self.items, create_item(item_type, name))
+                if item_type == "file" or item_type == "directory" then -- no link handeling for now
+                    table.insert(self.items, create_item(item_type, name))
+                end
             end
         end
     end,
@@ -65,11 +70,14 @@ Picker = {
         end
         vim.api.nvim_buf_set_lines(self.buf_id, 0, -1, false, parsed_file_titles)
         for i, item in ipairs(self.items) do
-            vim.api.nvim_buf_add_highlight(Picker.buf_id, PICKER_NS, "Error", i - 1, 0, #item.method + 1)
+            if item.type == "file" then
+                vim.api.nvim_buf_add_highlight(Picker.buf_id, PICKER_NS, "Error", i - 1, 0, #item.method + 1)
+            end
         end
     end,
     open_cursor_entity = function(self)
         local item = self.items[vim.api.nvim_win_get_cursor(0)[1]] -- the entries align perfectly with the cursor hence we can do it like that
+        P(item)
         if item.type == "file" then
             RECEIVE_EDITOR(self:get_relative_path(item.name))
         else

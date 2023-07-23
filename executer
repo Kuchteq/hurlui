@@ -2,7 +2,7 @@
 
 [ ! -s "$1" ] && exit 1
 [ -s "$2" ] && [ -f "$2" ] && INCLUDED_ENVIRON="--variables-file '$2'"
-OUTPUT=$(eval "hurl $INCLUDED_ENVIRON -i "$1" 2>&1")
+OUTPUT=$(eval "hurl $INCLUDED_ENVIRON -i '"$1"' 2>&1")
 HTTP_HEADERS=$(echo "$OUTPUT" | awk -v RS="" 'NR==1 {print $0}')
 RESPONSE_BODY=$(echo "$OUTPUT" | awk -v RS="" 'NR>1 {print $0}')
 FIRST_LINE=$(echo "$HTTP_HEADERS" | awk 'NR==1 {print}')
