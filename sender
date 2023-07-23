@@ -7,9 +7,7 @@ DESTFOLDER="$OUTPUTBASE/$BASENAME"
 
 [ -d  "$DESTFOLDER" ] && LATEST_FILE="$DESTFOLDER/$(ls "$DESTFOLDER" -t | head -n1)"
 if [ -f "$LATEST_FILE" ]; then    
-    nvim --server $LISTEN_ADDRESS --remote-send "<cmd>lua prepareOutput()<CR>"
-    nvim --server $LISTEN_ADDRESS --remote $LATEST_FILE
+    nvim --server $LISTEN_ADDRESS --remote-send "<cmd>lua RECEIVE_OUTPUT('$LATEST_FILE')<CR>"
 fi
 
-nvim --server $LISTEN_ADDRESS --remote-send "<cmd>lua prepareEditor()<CR>"
-nvim --server $LISTEN_ADDRESS --remote $1
+nvim --server $LISTEN_ADDRESS --remote-send "<cmd>lua RECEIVE_EDITOR('$1')<CR>"

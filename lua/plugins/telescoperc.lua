@@ -30,9 +30,9 @@ return {
                             local picker = action_state.get_current_picker(prompt_bufnr)
                             picker.get_selection_window = function(picker, entry)
                                 picker.get_selection_window = nil
-                                return OUTPUT_WIN_ID
+                                return Picker.win_id
                             end
-                            vim.api.nvim_win_set_option(OUTPUT_WIN_ID, "statusline", "Old! " .. getWindowBufName(OUTPUT_WIN_ID))
+                            vim.api.nvim_win_set_option(Picker.win_id, "statusline", "%#Comment#%{'Old'}%* " .. getWindowBufName(Picker.win_id))
                             return action_set.edit(prompt_bufnr, 'edit')
                         end,
                         ["<C-n>"] = "cycle_history_next",
