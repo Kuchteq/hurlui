@@ -62,7 +62,7 @@ local initial_cursor_shape = vim.o.guicursor;
 local Editor = {
     win_id = nil,
     win_close = function(self)
-        vim.api.nvim_win_close(self, true)
+        vim.api.nvim_win_close(self.win_id, true)
     end,
     current_req_name = nil;
     win_set_width = function(self, width)
@@ -93,7 +93,7 @@ local Output = {
         vim.api.nvim_set_current_win(self.win_id)
     end,
     win_close = function(self)
-        vim.api.nvim_win_close(self, true)
+        vim.api.nvim_win_close(self.win_id, true)
     end,
     win_set_width = function(self, width)
         vim.api.nvim_win_set_width(self.win_id, math.floor(width))
@@ -127,7 +127,7 @@ local Output = {
 local EnvEditorFactory = {
     win_id = nil,
     win_close = function(self)
-        vim.api.nvim_win_close(self, true)
+        vim.api.nvim_win_close(self.win_id, true)
     end,
     win_set_width = function(self, width)
         vim.api.nvim_win_set_width(self.win_id, math.floor(width))
@@ -149,22 +149,22 @@ local EnvEditorFactory = {
 Tabs = {
     runner = {
         inited = false,
-        isSmaller = false,
-        updateWinSize = function(self)
+        is_smaller = false,
+        update_win_size = function(self)
             if self.inited then
                 local wholeTerminalWidth = vim.go.columns;
                 if wholeTerminalWidth >= 80 then -- Choose the larger variant
-                    if self.isSmaller == true then
-                        self.fromSmallerLayout()
-                        self.isSmaller = false
+                    if self.is_smaller == true then
+                        self.from_smaller_layout()
+                        self.is_smaller = false
                     end
                     Picker:win_set_width(wholeTerminalWidth * 0.22)
                     Output:win_set_width(wholeTerminalWidth * 0.30)
                 else
                     if wholeTerminalWidth < 80 then -- Choose the smaller variant
-                        if self.isSmaller == false then
-                            self.toSmallerLayout();
-                            self.isSmaller = true;
+                        if self.is_smaller == false then
+                            self.to_smaller_layout();
+                            self.is_smaller = true;
                         end
                         Picker:win_set_width(wholeTerminalWidth * 0.22)
                         Editor:win_set_width(wholeTerminalWidth * 0.78)
@@ -172,18 +172,18 @@ Tabs = {
                 end
             end
         end,
-        toSmallerLayout = function()
-            Picker:win_close()
+        to_smaller_layout = function()
+            Output:win_close()
             Editor:win_set_focus()
             vim.cmd("belowright split output")
-            Picker.win_id = vim.api.nvim_get_current_win() -- keep win_id up to date
+            Output.win_id = vim.api.nvim_get_current_win() -- keep win_id up to date
             Editor:win_set_focus()
         end,
-        fromSmallerLayout = function()
-            Picker:win_close()
+        from_smaller_layout = function()
+            Output:win_close()
             Editor:win_set_focus()
             vim.cmd("vsplit output")
-            Picker.win_id = vim.api.nvim_get_current_win();
+            Output.win_id = vim.api.nvim_get_current_win();
             Editor:win_set_focus();
         end,
         run_hurl = function()
@@ -233,7 +233,7 @@ Tabs = {
                 -- unfortunately these need to be wrapped with anonymous(anoyingmous)
                 -- functions because we are accessing self inside the function
                 self.inited = true
-                self:updateWinSize()
+                self:update_win_size()
             end
         end,
         status = {
@@ -377,7 +377,7 @@ vim.api.nvim_create_autocmd({ "WinLeave" }, {
 vim.api.nvim_create_autocmd({ "VimResized" }, {
     callback = function()
         if Tabs.runner.inited then
-            Tabs.runner:updateWinSize()
+            Tabs.runner:update_win_size()
         end
     end
 })
