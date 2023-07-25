@@ -1,3 +1,4 @@
+vim.keymap.set("n", "r", ":qa!<CR>");
 P = function(a) -- debugging print
     print(vim.inspect(a))
 end
@@ -25,7 +26,6 @@ vim.opt.packpath:append(vim.fn.stdpath('data') .. '/packages')
 DEFAULT_ENVSPACE_NAME = vim.env.DEFAULT_ENVSPACE_NAME
 require('utils')
 require("theme")
-require("request_explorer")
 
 -- SET UP LAZY PACKAGE MANAGER
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -59,12 +59,12 @@ local initial_cursor_shape = vim.o.guicursor;
 
 -- Though creating three variables that are very similar may seem like a redundancy for now
 -- But this is just leaving the room for future improvements and side effect callbacks
-local Editor = {
+Editor = {
     win_id = nil,
     win_close = function(self)
         vim.api.nvim_win_close(self.win_id, true)
     end,
-    current_req_name = nil;
+    current_request_title = nil,
     win_set_width = function(self, width)
         vim.api.nvim_win_set_width(self.win_id, math.floor(width))
     end,
@@ -72,8 +72,8 @@ local Editor = {
         Tabs.runner:enter()
         self:win_set_focus();
         vim.cmd.edit(requestFilePath);
-        self.current_req_name = trunc_extension(vim.fn.expand('%:~:.'))
-        vim.api.nvim_win_set_option(self.win_id, "statusline", "%= Editor — " .. self.current_req_name  .. "%=")
+        self.current_request_title = trunc_extension(vim.fn.expand('%:~:.'))
+        vim.api.nvim_win_set_option(self.win_id, "statusline", "%= Editor — " .. self.current_request_title .. "%=")
     end,
     get_current_file_buf_id = function(self)
         return vim.api.nvim_win_get_buf(self.win_id)
@@ -119,7 +119,7 @@ local Output = {
         else
             Tabs.runner.status:update("")
         end
-        vim.api.nvim_win_set_option(self.win_id, "statusline", "%= ".. Editor.current_req_name .." at %t %=")
+        vim.api.nvim_win_set_option(self.win_id, "statusline", "%= " .. Editor.current_request_title .. " at %t %=")
     end
 }
 
@@ -152,22 +152,22 @@ Tabs = {
         is_smaller = false,
         update_win_size = function(self)
             if self.inited then
-                local wholeTerminalWidth = vim.go.columns;
-                if wholeTerminalWidth >= 80 then -- Choose the larger variant
+                local nvim_width = vim.go.columns;
+                if nvim_width >= 80 then -- Choose the larger variant
                     if self.is_smaller == true then
                         self.from_smaller_layout()
                         self.is_smaller = false
                     end
-                    Picker:win_set_width(wholeTerminalWidth * 0.22)
-                    Output:win_set_width(wholeTerminalWidth * 0.30)
+                    Picker:win_set_width(nvim_width * 0.22)
+                    Output:win_set_width(nvim_width * 0.30)
                 else
-                    if wholeTerminalWidth < 80 then -- Choose the smaller variant
+                    if nvim_width < 80 then -- Choose the smaller variant
                         if self.is_smaller == false then
                             self.to_smaller_layout();
                             self.is_smaller = true;
                         end
-                        Picker:win_set_width(wholeTerminalWidth * 0.22)
-                        Editor:win_set_width(wholeTerminalWidth * 0.78)
+                        Picker:win_set_width(nvim_width * 0.22)
+                        Editor:win_set_width(nvim_width * 0.78)
                     end
                 end
             end
@@ -228,7 +228,7 @@ Tabs = {
                         Tabs.env:select(vim.api.nvim_buf_get_name(0));
                         Tabs.env:buf_labels_refresh();
                     end
-                end, {silent=true});
+                end, { silent = true });
                 vim.keymap.set({ "n", "t" }, "<Tab>", function() TabsController:shift() end);
                 -- unfortunately these need to be wrapped with anonymous(anoyingmous)
                 -- functions because we are accessing self inside the function
@@ -237,7 +237,7 @@ Tabs = {
             end
         end,
         status = {
-            text = "",
+            text = "Welcome to hurlui, select a workspace, press <c-n> to initialise one or <c-s-n> to initialize at " .. vim.fn.getcwd() .."  ",
             update = function(self, incoming)
                 self.text = incoming;
             end
@@ -351,27 +351,20 @@ TabsController = {
     redraw_line = function()
         vim.cmd.redrawtabline()
     end
+
 }
+
 
 -- AUTOCMDS
 -- Makes sure that the user is able to choose the request straight away
-vim.api.nvim_create_autocmd({ "WinEnter" }, {
-    callback = function()
-        Picker.hide_cursor()
-    end
-})
 -- autosave
 vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertLeave" }, {
-  callback = function()
-      vim.api.nvim_command('silent update')
-  end,
-})
-vim.api.nvim_create_autocmd({ "WinLeave" }, {
     callback = function()
-        if Picker.win_id == vim.api.nvim_get_current_win() then
-            vim.o.guicursor = initial_cursor_shape;
+        local win_id = vim.api.nvim_get_current_win()
+        if win_id == Editor.win_id or vim.api.nvim_get_current_tabpage == 2 then
+            vim.api.nvim_command('silent update')
         end
-    end
+    end,
 })
 -- Make the window responsive
 vim.api.nvim_create_autocmd({ "VimResized" }, {
@@ -382,6 +375,7 @@ vim.api.nvim_create_autocmd({ "VimResized" }, {
     end
 })
 
+require("request_explorer")
 -- HOOKS for remote hurl callbacks from executer script
 RECEIVE_EDITOR = function(filePath)
     Editor:receiveEditor(filePath)
@@ -393,10 +387,10 @@ TABLINE_UPDATE = function()
     return TabsController:get_line()
 end
 
-Picker:init()
 Tabs.env:rescan()
 Tabs.env:set_default_selected()
 
 
+require("request_creator")
 vim.go.tabline = "%!v:lua.TABLINE_UPDATE()"
 require("lazy").setup("plugins")

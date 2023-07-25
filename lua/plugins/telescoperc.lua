@@ -22,19 +22,19 @@ return {
                         ["<C-j>"] = "move_selection_next",
                         ["<C-k>"] = "move_selection_previous",
                         ["<C-p>"] = "cycle_history_prev",
-                        ['<Enter>'] = function(prompt_bufnr)
-                            -- Use nvim-window-picker to choose the window by dynamically attaching a function
-                            local action_set = require('telescope.actions.set')
-                            local action_state = require('telescope.actions.state')
-
-                            local picker = action_state.get_current_picker(prompt_bufnr)
-                            picker.get_selection_window = function(picker, entry)
-                                picker.get_selection_window = nil
-                                return Picker.win_id
-                            end
-                            vim.api.nvim_win_set_option(Picker.win_id, "statusline", "%#Comment#%{'Old'}%* " .. getWindowBufName(Picker.win_id))
-                            return action_set.edit(prompt_bufnr, 'edit')
-                        end,
+                        -- ['<Enter>'] = function(prompt_bufnr)
+                        --     -- Use nvim-window-picker to choose the window by dynamically attaching a function
+                        --     local action_set = require('telescope.actions.set')
+                        --     local action_state = require('telescope.actions.state')
+                        --
+                        --     local picker = action_state.get_current_picker(prompt_bufnr)
+                        --     picker.get_selection_window = function(picker, entry)
+                        --         picker.get_selection_window = nil
+                        --         return Picker.win_id
+                        --     end
+                        --     vim.api.nvim_win_set_option(Picker.win_id, "statusline", "%#Comment#%{'Old'}%* " .. getWindowBufName(Picker.win_id))
+                        --     return action_set.edit(prompt_bufnr, 'edit')
+                        -- end,
                         ["<C-n>"] = "cycle_history_next",
                         ["ŋ"] = "close",
                         ["æ"] = "close"
