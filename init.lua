@@ -1,4 +1,4 @@
-vim.keymap.set("n", "r", ":qa!<CR>");
+--vim.keymap.set("n", "r", ":qa!<CR>");
 P = function(a) -- debugging print
     print(vim.inspect(a))
 end
@@ -55,7 +55,7 @@ vim.opt.undofile = true
 
 
 local blankBufId = vim.api.nvim_create_buf(true, true);
-local initial_cursor_shape = vim.o.guicursor;
+initial_cursor_shape = vim.o.guicursor;
 
 -- Though creating three variables that are very similar may seem like a redundancy for now
 -- But this is just leaving the room for future improvements and side effect callbacks

@@ -5,7 +5,9 @@ return {
         config = function()
             require("workspaces").setup(
                 {
-                    hooks = { open = "Telescope find_files",
+                    hooks = { open = function ()
+                        Picker:init()
+                    end,
                     }
                 }
             )
@@ -15,7 +17,9 @@ return {
 
             local workspace_picker_buf_id = vim.api.nvim_get_current_buf()
             vim.keymap.set({"i","n"}, "<c-s-n>", function ()
-                    require("workspaces").add_dir(vim.fn.getcwd())
+                    vim.api.nvim_win_close(0, true)
+                    require("workspaces").add(vim.fn.getcwd())
+                    require("workspaces").open(get_file_name(vim.fn.getcwd()))
             end, {buffer=workspace_picker_buf_id})
         end
     }

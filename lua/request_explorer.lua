@@ -60,6 +60,7 @@ Picker = {
                 end
             end
         })
+        Tabs.runner.status:update("")
     end,
     items = {},
     get_relative_path = function(self, item_name)
