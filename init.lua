@@ -7,10 +7,10 @@ local old_stdpath = vim.fn.stdpath
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.fn.stdpath = function(value)
     if value == "data" then
-        return vim.env.XDG_DATA_HOME .. "/hurlui"
+        return vim.env.HURLUI_NV_DATA
     end
     if value == "cache" then
-        return vim.env.XDG_CACHE_HOME .. "/hurlui"
+        return vim.env.HURLUI_NV_CACHE
     end
     if value == "config" then
         return vim.env.HURLUI_HOME
@@ -158,6 +158,7 @@ Tabs = {
                         self.from_smaller_layout()
                         self.is_smaller = false
                     end
+                    P(nvim_width)
                     Picker:win_set_width(nvim_width * 0.22)
                     Output:win_set_width(nvim_width * 0.30)
                 else

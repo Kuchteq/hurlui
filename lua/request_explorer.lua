@@ -32,35 +32,37 @@ Picker = {
         vim.api.nvim_win_set_width(self.win_id, math.floor(width))
     end,
     init = function(self)
-        self.win_id = vim.api.nvim_get_current_win();
-        self.buf_id = vim.api.nvim_create_buf(false, true);
-        vim.api.nvim_buf_set_name(self.buf_id, "Workspace")
-        vim.api.nvim_win_set_buf(self.win_id, self.buf_id)
-        vim.api.nvim_win_set_hl_ns(self.win_id, PICKER_NS)
-        self:hide_cursor()
-        self:fetch_items("./")
-        self:draw()
+        if not self.win_id then
+            self.win_id = vim.api.nvim_get_current_win();
+            self.buf_id = vim.api.nvim_create_buf(false, true);
+            vim.api.nvim_buf_set_name(self.buf_id, "Workspace")
+            vim.api.nvim_win_set_buf(self.win_id, self.buf_id)
+            vim.api.nvim_win_set_hl_ns(self.win_id, PICKER_NS)
+            self:hide_cursor()
+            self:fetch_items("./")
+            self:draw()
 
-        vim.keymap.set("n", "<enter>", function() self:open_cursor_entity() end, { buffer = true })
-        vim.keymap.set("n", "l", function() self:open_cursor_entity() end, { buffer = true })
-        vim.keymap.set("n", "h", function() self:pop() end, { buffer = true })
-        vim.keymap.set("n", "D", function() self:delete() end, { buffer = true })
+            vim.keymap.set("n", "<enter>", function() self:open_cursor_entity() end, { buffer = true })
+            vim.keymap.set("n", "l", function() self:open_cursor_entity() end, { buffer = true })
+            vim.keymap.set("n", "h", function() self:pop() end, { buffer = true })
+            vim.keymap.set("n", "D", function() self:delete() end, { buffer = true })
 
-        vim.api.nvim_create_autocmd({ "WinEnter" }, {
-            callback = function()
-                Picker.hide_cursor()
-                vim.cmd.stopinsert()
-            end,
-            group = self.buf_id
-        })
-        vim.api.nvim_create_autocmd({ "WinLeave" }, {
-            callback = function()
-                if Picker.win_id == vim.api.nvim_get_current_win() then
-                    vim.o.guicursor = initial_cursor_shape;
+            vim.api.nvim_create_autocmd({ "WinEnter" }, {
+                callback = function()
+                    Picker.hide_cursor()
+                    vim.cmd.stopinsert()
+                end,
+                group = self.buf_id
+            })
+            vim.api.nvim_create_autocmd({ "WinLeave" }, {
+                callback = function()
+                    if Picker.win_id == vim.api.nvim_get_current_win() then
+                        vim.o.guicursor = initial_cursor_shape;
+                    end
                 end
-            end
-        })
-        Tabs.runner.status:update("")
+            })
+            Tabs.runner.status:update("")
+        end
     end,
     items = {},
     get_relative_path = function(self, item_name)
@@ -100,6 +102,8 @@ Picker = {
     end,
     open_cursor_entity = function(self)
         local item = self.items[vim.api.nvim_win_get_cursor(0)[1]] -- the entries align perfectly with the cursor hence we can do it like that
+        if not item then return end
+
         if item.type == "file" then
             RECEIVE_EDITOR(self:get_relative_path(item.name))
         else
@@ -126,5 +130,4 @@ Picker = {
         self:fetch_items()
         self:draw()
     end
-
 }

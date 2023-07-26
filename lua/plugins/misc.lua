@@ -1,11 +1,15 @@
+WorkspacesTelescopeWidget = {
+    win_id = nil,
+    buf_id = nil
+}
 return {
     {
         'natecraddock/workspaces.nvim',
-        event =  "VeryLazy" ,
+        event = "VeryLazy",
         config = function()
             require("workspaces").setup(
                 {
-                    hooks = { open = function ()
+                    hooks = { open = function()
                         Picker:init()
                     end,
                     }
@@ -15,12 +19,15 @@ return {
             require('telescope').load_extension("workspaces")
             require("telescope").extensions.workspaces.workspaces()
 
-            local workspace_picker_buf_id = vim.api.nvim_get_current_buf()
-            vim.keymap.set({"i","n"}, "<c-s-n>", function ()
-                    vim.api.nvim_win_close(0, true)
-                    require("workspaces").add(vim.fn.getcwd())
-                    require("workspaces").open(get_file_name(vim.fn.getcwd()))
-            end, {buffer=workspace_picker_buf_id})
+            WorkspacesTelescopeWidget.win_id = vim.api.nvim_get_current_win()
+            WorkspacesTelescopeWidget.buf_id = vim.api.nvim_get_current_buf()
+
+            vim.keymap.set({ "i", "n" }, "<c-s-n>", function()
+                vim.api.nvim_win_close(0, true)
+                require("workspaces").add(vim.fn.getcwd())
+                Picker:init()
+                --require("workspaces").open(get_file_name(vim.fn.getcwd()))
+            end, { buffer = WorkspacesTelescopeWidget.buf_id })
         end
     }
 

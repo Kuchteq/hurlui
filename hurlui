@@ -1,12 +1,15 @@
 #!/bin/sh
 
+# These can be adjusted to your preference
 export HURLUI_TERM='foot -o font=Hack:pixelsize=30' # CHANGE THIS if you are using another 
 #terminal or set to nothing if you want it to run in the current terminal
 export OUTPUT_BASE="/tmp/hurlui" # CHANGE THIS if you want your queries to be persistant
 export DEFAULT_ENVSPACE_NAME="dev" # CHANGE THIS if you want your queries to be persistant
 
-
+# No need to really configure those
 export HURLUI_HOME=$(dirname $(readlink "$0")) 
+export HURLUI_NV_DATA="$XDG_DATA_HOME/hurlui"
+export HURLUI_NV_CACHE="$XDG_CACHE_HOME/hurlui"
 export PATH="$HURLUI_HOME:$PATH"
 export LISTEN_ADDRESS="/tmp/hurluiSocket$RANDOM" 
 
