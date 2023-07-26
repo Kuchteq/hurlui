@@ -1,3 +1,4 @@
+# This is basically garbage
 $HURLUI_TERM = "wt" # CHANGE THIS if you are using another terminal or set to nothing if you want it to run in the current terminal
 $env:OUTPUT_BASE = "C:\Temp\hurlui" # CHANGE THIS if you want your queries to be persistent
 $env:DEFAULT_ENVSPACE_NAME = "dev" # CHANGE THIS if you want your queries to be persistent
