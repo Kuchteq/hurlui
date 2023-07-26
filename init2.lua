@@ -29,13 +29,13 @@ vim.opt.packpath:append(vim.fn.stdpath('data') .. '/packages')
 
 -- Globals
 DEFAULT_ENVSPACE_NAME = vim.env.DEFAULT_ENVSPACE_NAME
-OUTPUT_BASE = vim.env.OUTPUT_BASE
-INITIAL_CURSOR_SHAPE = vim.o.guicursor;
 
 -- SET UP LAZY PACKAGE MANAGER
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then vim.fn.system({ "git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath, }) end
 vim.opt.rtp:prepend(lazypath)
+
+
 
 --MISC SETTINGS
 vim.g.mapleader = ' '
@@ -54,54 +54,7 @@ vim.o.clipboard = "unnamedplus"
 vim.opt.cmdheight = 0
 vim.opt.termguicolors = true
 vim.o.laststatus = 2
-vim.opt.statusline = "%= %{expand('%:~:.')} %=" -- Center the bottom status line
+vim.opt.statusline = "%= %{expand('%:~:.')} %="                    -- Center the bottom status line
 vim.opt.undodir = { vim.fn.stdpath('cache') .. "/hurly/.undodir" } -- set up undodir
 vim.opt.undofile = true
 
-require("theme")
-require("modals.jwt")
-require("lazy").setup("plugins")
---
-
-
-vim.keymap.set("n", "<c-n>", function() require("modals.request"):show() end)
-vim.keymap.set("n", "<c-s-d>", function() require("modals.dir"):show() end)
-
--- Though creating three variables that are very similar may seem like a redundancy for now
--- But this is just leaving the room for future improvements and side effect callbacks
-
-
--- AUTOCMDS
--- Makes sure that the user is able to choose the request straight away
--- autosave
-api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertLeave" }, {
-    callback = function()
-        local win_id = api.nvim_get_current_win()
-        if vim.bo.modified and not vim.bo.readonly and vim.fn.expand("%") ~= "" and vim.bo.buftype == "" then
-            api.nvim_command('silent update')
-        end
-        -- if win_id == Editor.win_id or api.nvim_get_current_tabpage == 2 then
-        --     api.nvim_command('silent update')
-        -- end
-    end,
-})
-
--- Make the window responsive
-local tabs_runner = require("tabs.runner")
-api.nvim_create_autocmd({ "VimResized" }, {
-    callback = function()
-        if tabs_runner.inited then
-            tabs_runner:update_win_size()
-        end
-    end
-})
-
--- HOOKS for remote hurl callbacks from executer script
--- RECEIVE_OUTPUT = function(filePath, statusResponse)
---     Output:receiveOutput(filePath, statusResponse)
--- end
-TABLINE_UPDATE = function()
-    return require("tabs.controller"):get_line()
-end
-
-vim.go.tabline = "%!v:lua.TABLINE_UPDATE()"

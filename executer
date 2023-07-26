@@ -22,10 +22,10 @@ DESTFOLDER="$OUTPUT_BASE/$BASENAME"
 DEST="$DESTFOLDER/$(date +%H:%M:%SD%d-%m-%Y).$EXTENSION"
 
 if [ $EXTENSION = "json" ]; then
-    echo "$RESPONSE_BODY" > "$DEST" 
+    echo "$RESPONSE_BODY" | jq . > "$DEST" 
 elif [ $EXTENSION = "octet-stream" ]; then
     echo "$HTTP_HEADERS $RESPONSE_BODY" > "$DEST" 
 else
     echo "$RESPONSE_BODY" > "$DEST"
 fi
-nvim --server $LISTEN_ADDRESS --remote-send "<cmd>lua RECEIVE_OUTPUT('$DEST','$FIRST_LINE')<CR>"
+nvim --server $LISTEN_ADDRESS --remote-send "<cmd>lua require('panels.output'):receive_output('$DEST','$FIRST_LINE')<CR>"

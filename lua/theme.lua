@@ -296,16 +296,16 @@ vim.g.terminal_color_15 = p.color15
 
 local setHl = function(group, color)
     color = vim.tbl_extend('force', color, { fg = color.fg, bg = color.bg, sp = color.sp })
-    vim.api.nvim_set_hl(0, group, color)
+    api.nvim_set_hl(0, group, color)
 end
 
-ENV_EDITOR_NS = vim.api.nvim_create_namespace("env_editor_ns");
-vim.api.nvim_set_hl(ENV_EDITOR_NS, "StatusLineNC", { bg = p.color1, fg = p.background })
-vim.api.nvim_set_hl(ENV_EDITOR_NS, "StatusLine", { bg = p.color3, fg = p.background })
-vim.api.nvim_set_hl(ENV_EDITOR_NS, "WinSeparator", { bg = background, fg = p.color1 })
+ENV_EDITOR_NS = api.nvim_create_namespace("env_editor_ns");
+api.nvim_set_hl(ENV_EDITOR_NS, "StatusLineNC", { bg = p.color1, fg = p.background })
+api.nvim_set_hl(ENV_EDITOR_NS, "StatusLine", { bg = p.color3, fg = p.background })
+api.nvim_set_hl(ENV_EDITOR_NS, "WinSeparator", { bg = background, fg = p.color1 })
 
-PICKER_NS = vim.api.nvim_create_namespace("picker_ns"); 
-vim.api.nvim_set_hl(PICKER_NS, "CursorLine", { bg = p.picker_cursor_line, })
+PICKER_NS = api.nvim_create_namespace("picker_ns"); 
+api.nvim_set_hl(PICKER_NS, "CursorLine", { bg = p.picker_cursor_line, })
 
 for group, color in pairs(theme) do
     setHl(group, color)

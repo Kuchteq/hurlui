@@ -1,0 +1,8 @@
+{
+    "diagnostics.globals": [
+        "api",
+        "INITIAL_CURSOR_SHAPE",
+        "DEFAULT_ENVSPACE_NAME",
+        "OUTPUT_BASE"
+    ]
+}
