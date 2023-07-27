@@ -1,3 +1,4 @@
+-- This is acts as the entry to the program
 local u = require('utils')
 return {
     {
