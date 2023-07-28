@@ -86,10 +86,6 @@ return {
             --           api.nvim_buf_set_name(blank_buf_id, "output");
 
             -- KEYBINDINGS
-            vim.keymap.set({ "n", "t" }, "<C-h>", "<C-w>h")
-            vim.keymap.set({ "n", "t" }, "<C-j>", "<C-w>j")
-            vim.keymap.set({ "n", "t" }, "<C-k>", "<C-w>k")
-            vim.keymap.set({ "n", "t" }, "<C-l>", "<C-w>l")
 
             vim.keymap.set("n", "<F1>", function() picker_panel.win:set_focus() end)
             vim.keymap.set({ "t", "n" }, "<F2>", function() editor_panel.win:set_focus() end)
@@ -100,9 +96,6 @@ return {
                     --api. = "grzyb %f %=" -- Center the bottom status line
                 end
             end);
-            vim.keymap.set("n", "<leader>a", function()
-                env_tab:alternate();
-            end);
 
             vim.keymap.set("n", "<enter>", function()
                 if tabs_controller.current_tab == 1 then
@@ -112,7 +105,6 @@ return {
                     env_tab:buf_labels_refresh();
                 end
             end, { silent = true });
-            vim.keymap.set({ "n", "t" }, "<Tab>", function() tabs_controller:shift() end);
             -- unfortunately these need to be wrapped with anonymous(anoyingmous)
             -- functions because we are accessing self inside the function
             self.inited = true

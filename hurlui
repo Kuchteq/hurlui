@@ -11,7 +11,7 @@ export HURLUI_HOME=$(dirname $(readlink "$0"))
 export HURLUI_NV_DATA="$XDG_DATA_HOME/hurlui"
 export HURLUI_NV_CACHE="$XDG_CACHE_HOME/hurlui"
 export PATH="$HURLUI_HOME:$PATH"
-export LISTEN_ADDRESS="/tmp/hurluiSocket$RANDOM" 
+export LISTEN_ADDRESS="$XDG_RUNTIME_DIR/hurlui.$RANDOM" 
 
 [ ! -d "$OUTPUT_BASE" ] && mkdir "$OUTPUT_BASE"
 # [ ! -d "$PWD/.envs" ] && mkdir "$PWD/.envs"

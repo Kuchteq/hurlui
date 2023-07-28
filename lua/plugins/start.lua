@@ -21,6 +21,7 @@ return {
                 require("workspaces").add(vim.fn.getcwd())
                 require("panels.picker"):init()
                 require("workspaces").open(u.get_file_name(vim.fn.getcwd()))
+                require("workspaces").open(u.get_file_name(vim.fn.getcwd()))
                 --
             end, { buffer = api.nvim_get_current_buf() })
         end

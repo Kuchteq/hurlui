@@ -3,7 +3,9 @@ return {
         return api.nvim_buf_get_name(api.nvim_win_get_buf(window))
     end,
     get_file_name = function(file)
-        return file:match("^.+/(.+)$")
+        if file then
+            return file:match("^.+/(.+)$")
+        end
     end,
     trunc_extension = function(file)
         local without = file:match("(.+)%..+$")

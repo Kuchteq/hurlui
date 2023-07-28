@@ -5,7 +5,6 @@ api = vim.api
 P = function(a)
     print(vim.inspect(a))
 end
-vim.keymap.set("n", "r", ":qa!<CR>");
 
 -- CODE RELATED TO SEPERATING HURLUI FROM REGULAR NVIM
 local old_stdpath = vim.fn.stdpath
@@ -61,11 +60,15 @@ vim.opt.undofile = true
 require("theme")
 require("modals.jwt")
 require("lazy").setup("plugins")
---
 
 
+vim.keymap.set({ "n", "t" }, "<C-h>", "<C-w>h")
+vim.keymap.set({ "n", "t" }, "<C-j>", "<C-w>j")
+vim.keymap.set({ "n", "t" }, "<C-k>", "<C-w>k")
+vim.keymap.set({ "n", "t" }, "<C-l>", "<C-w>l")
 vim.keymap.set("n", "<c-n>", function() require("modals.request"):show() end)
 vim.keymap.set("n", "<c-s-d>", function() require("modals.dir"):show() end)
+vim.keymap.set("n", "<leader>a", function() require("tabs.env"):alternate(); end);
 
 -- Though creating three variables that are very similar may seem like a redundancy for now
 -- But this is just leaving the room for future improvements and side effect callbacks

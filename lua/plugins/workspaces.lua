@@ -20,6 +20,7 @@ return {
                                 picker:fetch_items()
                                 picker:draw()
                             else
+                                vim.keymap.set({ "n", "t" }, "<Tab>", function() require("tabs.controller"):shift() end);
                                 picker:init()
                             end
                         end,
