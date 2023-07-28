@@ -13,8 +13,9 @@ return {
     },
     init = function(self)
         if not self.win.id then
+            api.nvim_set_current_win(1000) -- make sure we are at the initial window first
             self.win.id = api.nvim_get_current_win();
-            self.buf.id = api.nvim_create_buf(false, true);
+            self.buf.id = vim.api.nvim_create_buf(false, true);
             api.nvim_buf_set_name(self.buf.id, "Workspace")
             api.nvim_win_set_buf(self.win.id, self.buf.id)
             api.nvim_win_set_hl_ns(self.win.id, PICKER_NS)

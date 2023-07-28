@@ -7,12 +7,13 @@ return {
         local editor_request_title = require("panels.editor").current_request_title
         runner:enter()
         if output_path then
-            vim.cmd.badd(output_path) -- fetch the given file and create a buffer for it
-            local output_buffer_id = api.nvim_list_bufs()[#api.nvim_list_bufs()]
-            self.win:set_buf(output_buffer_id);
+            vim.api.nvim_win_call(self.win.id, function ()
+                vim.cmd.edit(output_path) -- fetch the given file and create a buffer for it
+            end)
+            -- self.win:set_buf(output_buffer_id);
             api.nvim_win_set_option(self.win.id, "statusline", "%= " .. editor_request_title .. " at %t %=")
         else
-            self.win:set_buf(self.blank_buffer);
+            -- self.win:set_buf(self.blank_buffer);
             api.nvim_win_set_option(self.win.id, "statusline", "%= No history here %=")
         end
 

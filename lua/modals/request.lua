@@ -41,9 +41,7 @@ return {
             self.name.buf_id = api.nvim_create_buf(true, true)
             vim.keymap.set("i", "<enter>", function() self:create() end, { buffer = self.name.buf_id })
             vim.keymap.set({ "n", "i" }, "<c-c>", function() self:cancel() end, {buffer= self.name.buf_id})
-            --self.boot.buf_id = api.nvim_create_buf(false, true)
         end
-        --        api.nvim_buf_set_lines(self.buf_id, 0, -1, true, { "You can add content here." })
         self.name.win_id = api.nvim_open_win(self.name.buf_id, true, self.name:get_build())
         -- self.draw_window(self.boot, false)
         vim.cmd.startinsert()

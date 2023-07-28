@@ -86,6 +86,13 @@ api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertLeave" }, {
     end,
 })
 
+local sync_dir_with_shell = function()
+    vim.api.nvim_chan_send(2,'\x1b]7;file://'.. vim.fn.hostname() .. vim.fn.getcwd())
+end
+vim.api.nvim_create_autocmd({ "DirChanged" }, {
+    callback = sync_dir_with_shell
+})
+
 -- Make the window responsive
 local tabs_runner = require("tabs.runner")
 api.nvim_create_autocmd({ "VimResized" }, {
@@ -96,6 +103,7 @@ api.nvim_create_autocmd({ "VimResized" }, {
     end
 })
 
+require("modals.envsetup")
 -- HOOKS for remote hurl callbacks from executer script
 -- RECEIVE_OUTPUT = function(filePath, statusResponse)
 --     Output:receiveOutput(filePath, statusResponse)
