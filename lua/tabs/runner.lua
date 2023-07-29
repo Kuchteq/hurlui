@@ -1,4 +1,3 @@
-local u = require('utils')
 local picker_panel = require("panels.picker")
 local editor_panel = require("panels.editor")
 local output_panel = require("panels.output")
@@ -17,7 +16,7 @@ return {
                     self.is_smaller = false
                 end
                 picker_panel.win:set_width(nvim_width * 0.22)
-                output_panel.win:set_width(nvim_width * 0.30)
+                output_panel.win:set_width(nvim_width * 0.35)
             else
                 if nvim_width < 80 then -- Choose the smaller variant
                     if self.is_smaller == false then
@@ -31,17 +30,22 @@ return {
         end
     end,
     to_smaller_layout = function()
+        local last_buf = output_panel.win:get_buf()
         output_panel.win:close()
         editor_panel.win:set_focus()
         vim.cmd("belowright split output")
+        api.nvim_set_current_buf(last_buf)
         output_panel.win.id = api.nvim_get_current_win() -- keep win_id up to date
-        editor_panel.win.set_focus()
+        editor_panel.win:set_focus()
     end,
     from_smaller_layout = function()
+        local last_buf = output_panel.win:get_buf()
         output_panel.win:close()
         editor_panel.win:set_focus()
         vim.cmd("vsplit output")
         output_panel.win.id = api.nvim_get_current_win();
+        api.nvim_set_current_buf(last_buf)
+        api.nvim_set_current_buf(output_panel.win:get_buf())
         output_panel.win:set_focus();
     end,
     run_hurl = function(self)
@@ -55,14 +59,14 @@ return {
             command = 'executer',
             args = { hurl_file_path, appended_env_path },
         }):start()
-        self.stopwatch:start_display()
         self.stopwatch.start_time = vim.loop.now()
+        self.stopwatch:start_display()
     end,
     stopwatch = {
         start_time = nil,
         display_timer = vim.loop.new_timer(),
         get_elapsed = function (self)
-            return (vim.loop.now() - self.start_time)
+            return vim.loop.now() - self.start_time
         end,
         start_display = function(self)
             self.display_timer:start(0, 100, vim.schedule_wrap(function()
@@ -72,20 +76,16 @@ return {
         end,
         stop_display = function(self)
             self.display_timer:stop()
-            self.start_time = nil
         end
     },
+    -- We should probably seperate init from enter
     enter = function(self)
+        vim.api.nvim_set_current_tabpage(1)
         if not self.inited then
-            vim.o.splitright = true;
             vim.cmd.vsplit()
             editor_panel.win.id = api.nvim_get_current_win();
             vim.cmd.vsplit()
             output_panel.win.id = api.nvim_get_current_win();
-            --            output_panel.win:set_buf(blank_buf_id)
-            --           api.nvim_buf_set_name(blank_buf_id, "output");
-
-            -- KEYBINDINGS
 
             vim.keymap.set("n", "<F1>", function() picker_panel.win:set_focus() end)
             vim.keymap.set({ "t", "n" }, "<F2>", function() editor_panel.win:set_focus() end)
@@ -93,7 +93,6 @@ return {
             vim.keymap.set("n", "<S-enter>", function()
                 if tabs_controller.current_tab == 2 then
                     env_tab.alternator = api.nvim_buf_get_name(0);
-                    --api. = "grzyb %f %=" -- Center the bottom status line
                 end
             end);
 
@@ -105,8 +104,6 @@ return {
                     env_tab:buf_labels_refresh();
                 end
             end, { silent = true });
-            -- unfortunately these need to be wrapped with anonymous(anoyingmous)
-            -- functions because we are accessing self inside the function
             self.inited = true
             self:update_win_size()
         end

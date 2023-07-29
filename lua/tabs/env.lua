@@ -2,6 +2,7 @@ local u = require('utils')
 local tabs_controller = require("tabs.controller")
 local get_env_editor = require('panels.get_env_editor')
 
+
 return {
     inited = false,
     paths = nil, -- nil means env has not yet been initialized,
@@ -45,24 +46,49 @@ return {
     end,
     enter = function(self)
         local runner_tab = require("tabs.runner")
-
+        vim.api.nvim_set_current_tabpage(2)
         self:rescan()
         if not self.inited and self.paths and #self.paths > 0 then
             for i = 1, #self.paths do
-                if i == 1 then vim.cmd.tabnew(self.paths[1]) else vim.cmd.vsplit(self.paths[i]) end
+                if i == 1 then
+                    vim.cmd.edit(self.paths[1])
+                else
+                    vim.cmd.vsplit(self.paths[i])
+                end
                 local new_window = get_env_editor():init();
                 vim.bo.filetype = "sh"
                 table.insert(self.env_editors, new_window);
                 api.nvim_win_set_hl_ns(new_window.win.id, ENV_EDITOR_NS);
             end
-            api.nvim_set_current_win(self.env_editors[1].win.id)
             self.inited = true
         elseif not self.paths or #self.paths <= 0 then
-            runner_tab.status:update("%#Normal#No envs! Make sure you have the 'envs' directory and at least one file there")
+            require("modals.envsetup").show()
+            self.status:update()
         end
         self:buf_labels_refresh()
     end,
+    add = function(self, name)
+        local env_path = "./.envs/" .. name;
+        local file, err = io.open(env_path, "w")
+        if not file then
+            -- If there was an error opening the file, handle the error
+            print("Error creating the file: " .. err)
+        else
+            file:close()
+            if self.inited then
+                vim.api.nvim_set_current_tabpage(2)
+                vim.cmd.vsplit(env_path)
+                local new_window = get_env_editor():init();
+                table.insert(self.env_editors, new_window);
+                api.nvim_win_set_hl_ns(new_window.win.id, ENV_EDITOR_NS);
+                self:buf_labels_refresh()
+            else
+                self:enter()
+            end
+        end
+    end,
     buf_labels_refresh = function(self)
+        P(self.env_editors)
         for i = 1, #self.env_editors do
             local editor = self.env_editors[i]
             local title = "%= %t %=";
@@ -76,14 +102,17 @@ return {
     end,
     status = {
         text = "",
-        onEnterUpdate = function(self)
+        update = function(self)
+            P(self.paths)
+            P(self.paths)
             if self.paths and #self.paths > 0 then
                 self.text = "No env files in workspace's directory"
-            elseif self.paths then
+            elseif not self.paths then
                 self.text = "No envs directory in workspace"
             else
                 self.text = #self.paths .. " enviornments"
             end
+            tabs_controller.redraw_line()
         end
     }
 }

@@ -7,9 +7,9 @@ return {
     end,
     urgent_status = nil,
     get_line = function(self)
+        -- Runner always has the tabId of 1 and env page 2
         local env_tab = require("tabs.env")
         local runner_tab = require("tabs.runner")
-        -- Runner always has the tabId of 1 and env page 2
         self.current_tab = vim.fn.tabpagenr()
         -- tab_info is essentially what is displayed on the left
         local tab_info = self:_boiler_line_prepare(1) .. "Runner ";
@@ -20,9 +20,13 @@ return {
     end,
     shift = function(self)
         local env_tab = require("tabs.env")
-        vim.cmd.tabNext()
-        env_tab:enter()
+        local runner_tab = require("tabs.runner")
         self.current_tab = vim.fn.tabpagenr();
+        if self.current_tab == 1 then
+            env_tab:enter()
+        else
+            vim.cmd.tabprevious()
+        end
         self:redraw_line()
     end,
     redraw_line = function()

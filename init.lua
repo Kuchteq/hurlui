@@ -53,21 +53,24 @@ vim.o.clipboard = "unnamedplus"
 vim.opt.cmdheight = 0
 vim.opt.termguicolors = true
 vim.o.laststatus = 2
-vim.opt.statusline = "%= %{expand('%:~:.')} %=" -- Center the bottom status line
+vim.opt.statusline = "%= %{expand('%:~:.')} %="                    -- Center the bottom status line
 vim.opt.undodir = { vim.fn.stdpath('cache') .. "/hurly/.undodir" } -- set up undodir
 vim.opt.undofile = true
+vim.o.splitright = true;
 
 require("theme")
 require("modals.jwt")
 require("lazy").setup("plugins")
 
 
+-- keybindings
 vim.keymap.set({ "n", "t" }, "<C-h>", "<C-w>h")
 vim.keymap.set({ "n", "t" }, "<C-j>", "<C-w>j")
 vim.keymap.set({ "n", "t" }, "<C-k>", "<C-w>k")
 vim.keymap.set({ "n", "t" }, "<C-l>", "<C-w>l")
 vim.keymap.set("n", "<c-n>", function() require("modals.request"):show() end)
 vim.keymap.set("n", "<c-s-d>", function() require("modals.dir"):show() end)
+vim.keymap.set({ "i", "n" }, "<c-s-e>", function() if require("panels.picker").win.id then require("modals.envsetup").show() end end)
 vim.keymap.set("n", "<leader>a", function() require("tabs.env"):alternate(); end);
 
 -- Though creating three variables that are very similar may seem like a redundancy for now
@@ -75,42 +78,37 @@ vim.keymap.set("n", "<leader>a", function() require("tabs.env"):alternate(); end
 
 
 -- AUTOCMDS
--- Makes sure that the user is able to choose the request straight away
 -- autosave
 api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertLeave" }, {
     callback = function()
-        local win_id = api.nvim_get_current_win()
         if vim.bo.modified and not vim.bo.readonly and vim.fn.expand("%") ~= "" and vim.bo.buftype == "" then
             api.nvim_command('silent update')
         end
-        -- if win_id == Editor.win_id or api.nvim_get_current_tabpage == 2 then
-        --     api.nvim_command('silent update')
-        -- end
     end,
 })
 
+-- This allows the terminal to keep up with the workspaces path
 local sync_dir_with_shell = function()
-    vim.api.nvim_chan_send(2,'\x1b]7;file://'.. vim.fn.hostname() .. vim.fn.getcwd())
+    vim.api.nvim_chan_send(2, '\x1b]7;file://' .. vim.fn.hostname() .. vim.fn.getcwd())
 end
 vim.api.nvim_create_autocmd({ "DirChanged" }, {
     callback = sync_dir_with_shell
 })
 
 -- Make the window responsive
-local tabs_runner = require("tabs.runner")
 api.nvim_create_autocmd({ "VimResized" }, {
     callback = function()
+        local tabs_runner = require("tabs.runner")
         if tabs_runner.inited then
             tabs_runner:update_win_size()
         end
     end
 })
 
+vim.cmd.tabnew()
+vim.cmd.tabprevious()
 require("modals.envsetup")
--- HOOKS for remote hurl callbacks from executer script
--- RECEIVE_OUTPUT = function(filePath, statusResponse)
---     Output:receiveOutput(filePath, statusResponse)
--- end
+
 TABLINE_UPDATE = function()
     return require("tabs.controller"):get_line()
 end

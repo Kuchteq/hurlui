@@ -9,7 +9,7 @@ return {
         config = function()
             require('dressing').setup({
                 input = {
-                    relative = "win"
+                    relative = "editor"
                 }
             })
         end

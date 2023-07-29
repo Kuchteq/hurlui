@@ -1,10 +1,11 @@
 #!/bin/sh
 
 # These can be adjusted to your preference
-export HURLUI_TERM='foot -o font=Hack:pixelsize=30 -w 3840x2160' # CHANGE THIS if you are using another 
+export HURLUI_TERM='' # CHANGE THIS if you want Hurlui to start in a new terminal window
+#export HURLUI_TERM='foot -o font=Hack:pixelsize=30 -w 3840x2160' # Example
 #terminal or set to nothing if you want it to run in the current terminal
 export OUTPUT_BASE="/tmp/hurlui" # CHANGE THIS if you want your queries to be persistant
-export DEFAULT_ENVSPACE_NAME="local" # CHANGE THIS if you want your queries to be persistant
+export DEFAULT_ENVSPACE_NAME="local" # CHANGE THIS so that hurlui picks up this environment automatically on start
 
 # No need to really configure those
 export HURLUI_HOME=$(dirname $(readlink "$0")) 
@@ -14,7 +15,5 @@ export PATH="$HURLUI_HOME:$PATH"
 export LISTEN_ADDRESS="$XDG_RUNTIME_DIR/hurlui.$RANDOM" 
 
 [ ! -d "$OUTPUT_BASE" ] && mkdir "$OUTPUT_BASE"
-# [ ! -d "$PWD/.envs" ] && mkdir "$PWD/.envs"
-# [ ! -f "$PWD/.envs/$DEFAULT_ENVSPACE_NAME" ] && touch "$PWD/.envs/$DEFAULT_ENVSPACE_NAME
 
 $HURLUI_TERM nvim -u $HURLUI_HOME/init.lua --listen $LISTEN_ADDRESS $@

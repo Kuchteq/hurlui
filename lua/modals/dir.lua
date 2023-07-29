@@ -29,7 +29,7 @@ return {
             height = 1,
             border = "rounded",
             style = "minimal",
-            title = "< Subgroup bootstrap options >",
+            title = "< Subgroup bootstrap template >",
             title_pos = "center"
         },
         get_build = function(self)
@@ -43,10 +43,8 @@ return {
             vim.keymap.set({ "n", "i" }, "<c-c>", function() self:cancel() end, {buffer= self.name.buf_id})
             self.boot.buf_id = api.nvim_create_buf(false, true)
         end
-        --        api.nvim_buf_set_lines(self.buf_id, 0, -1, true, { "You can add content here." })
         self.name.win_id = api.nvim_open_win(self.name.buf_id, true, self.name:get_build())
         -- selfdraw_window(self.boot, false)
-        vim.cmd.startinsert()
     end,
     hide = function(self)
         api.nvim_win_hide(self.name.win_id)
