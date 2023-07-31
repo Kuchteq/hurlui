@@ -1,5 +1,5 @@
 return {
-    get_buf_name_by_win_in = function(window)
+    get_buf_name_by_win_id = function(window)
         return api.nvim_buf_get_name(api.nvim_win_get_buf(window))
     end,
     get_file_name = function(file)
@@ -12,7 +12,7 @@ return {
         if without then return without else return file end
         ;
     end,
-    contains_substring_in_table = function(tbl, substring)
+    tbl_first_string_with_substring = function(tbl, substring)
         for _, str in ipairs(tbl) do
             if string.find(str, substring) then
                 return str
@@ -34,5 +34,16 @@ return {
     end,
     draw_window = function(element, enter)
         element.win_id = api.nvim_open_win(element.buf_id, enter, element:get_build())
+    end,
+    tabpage_get_bufs_names = function(tabpage)
+        return vim.tbl_map(function(val) return api.nvim_buf_get_name(api.nvim_win_get_buf(val)) end, api.nvim_tabpage_list_wins(tabpage))
+    end,
+    set_win_focus_by_buf_name = function(name)
+        for _, win_id in ipairs(api.nvim_list_wins()) do
+            if require("utils").get_buf_name_by_win_id(win_id) == name then
+                api.nvim_set_current_win(win_id)
+            end
+        end
     end
+
 }

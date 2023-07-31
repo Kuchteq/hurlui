@@ -40,11 +40,10 @@ return {
         if not self.name.buf_id then
             self.name.buf_id = api.nvim_create_buf(true, true)
             vim.keymap.set("i", "<enter>", function() self:create() end, { buffer = self.name.buf_id })
-            vim.keymap.set({ "n", "i" }, "<c-c>", function() self:cancel() end, {buffer= self.name.buf_id})
+            vim.keymap.set({ "n", "i" }, "<c-c>", function() self:cancel() end, { buffer = self.name.buf_id })
         end
         self.name.win_id = api.nvim_open_win(self.name.buf_id, true, self.name:get_build())
         -- self.draw_window(self.boot, false)
-        vim.cmd.startinsert()
     end,
     hide = function(self)
         api.nvim_win_hide(self.name.win_id)
@@ -70,4 +69,3 @@ return {
         self:hide();
     end
 }
-

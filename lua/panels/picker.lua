@@ -27,13 +27,20 @@ return {
             vim.keymap.set("n", "l", function() self:open_cursor_entity() end, { buffer = true })
             vim.keymap.set("n", "h", function() self:pop() end, { buffer = true })
             vim.keymap.set("n", "D", function() self:delete() end, { buffer = true })
+            vim.keymap.set("n", "n", function() require("modals.request"):show() end, { buffer = true })
+            --
 
+            -- api.nvim_create_autocmd({ "ModeChangd" }, {
+            --     callback = function()
+            --         vim.cmd.stopinsert()
+            --     end,
+            --     buffer = self.buf.id
+            -- })
             api.nvim_create_autocmd({ "WinEnter" }, {
                 callback = function()
                     self:hide_cursor()
-                    vim.cmd.stopinsert()
                 end,
-                group = self.buf.id
+                buffer = self.buf.id
             })
             api.nvim_create_autocmd({ "WinLeave" }, {
                 callback = function()
@@ -44,7 +51,7 @@ return {
             })
 
             env_tab:rescan()
-            env_tab:set_default_selected()
+            env_tab:set_defaults()
             require("tabs.runner").status:update("")
         end
     end,

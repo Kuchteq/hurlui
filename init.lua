@@ -1,6 +1,7 @@
 ---@diagnostic disable-next-line: lowercase-global
 api = vim.api
 
+vim.keymap.set({ "n", "t" }, "r", ":qa!<CR>")
 -- Easier debugging
 P = function(a)
     print(vim.inspect(a))
@@ -53,7 +54,7 @@ vim.o.clipboard = "unnamedplus"
 vim.opt.cmdheight = 0
 vim.opt.termguicolors = true
 vim.o.laststatus = 2
-vim.opt.statusline = "%= %{expand('%:~:.')} %="                    -- Center the bottom status line
+vim.opt.statusline = "%= %t %="                    -- Center the bottom status line
 vim.opt.undodir = { vim.fn.stdpath('cache') .. "/hurly/.undodir" } -- set up undodir
 vim.opt.undofile = true
 vim.o.splitright = true;
@@ -72,6 +73,24 @@ vim.keymap.set("n", "<c-n>", function() require("modals.request"):show() end)
 vim.keymap.set("n", "<c-s-d>", function() require("modals.dir"):show() end)
 vim.keymap.set({ "i", "n" }, "<c-s-e>", function() if require("panels.picker").win.id then require("modals.envsetup").show() end end)
 vim.keymap.set("n", "<leader>a", function() require("tabs.env"):alternate(); end);
+vim.keymap.set("n", "<S-enter>", function()
+    local env_tab = require("tabs.env")
+    if api.nvim_get_current_tabpage() == 2 then
+        env_tab:alternator_select(api.nvim_buf_get_name(0));
+    end
+end);
+
+vim.keymap.set("n", "<enter>", function()
+    local runner_tab = require("tabs.runner")
+    local env_tab = require("tabs.env")
+    if api.nvim_get_current_tabpage() == 1 then
+        runner_tab:run_hurl();
+    else
+        env_tab:select(api.nvim_buf_get_name(0));
+        env_tab:buf_labels_refresh();
+    end
+end, { silent = true });
+
 
 -- Though creating three variables that are very similar may seem like a redundancy for now
 -- But this is just leaving the room for future improvements and side effect callbacks

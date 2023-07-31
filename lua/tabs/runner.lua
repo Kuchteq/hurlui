@@ -50,8 +50,7 @@ return {
     end,
     run_hurl = function(self)
         api.nvim_command('silent! update')
-        require("plenary.async")
-        local Job = require 'plenary.job'
+        local Job = require('plenary.job')
         self.start_request_time = vim.loop.new_timer()
         local hurl_file_path = editor_panel.win:get_file_path()
         local appended_env_path = env_tab.selected and env_tab.selected or "";
@@ -65,7 +64,7 @@ return {
     stopwatch = {
         start_time = nil,
         display_timer = vim.loop.new_timer(),
-        get_elapsed = function (self)
+        get_elapsed = function(self)
             return vim.loop.now() - self.start_time
         end,
         start_display = function(self)
@@ -90,21 +89,7 @@ return {
             vim.keymap.set("n", "<F1>", function() picker_panel.win:set_focus() end)
             vim.keymap.set({ "t", "n" }, "<F2>", function() editor_panel.win:set_focus() end)
             vim.keymap.set({ "t", "n" }, "<F3>", function() output_panel.win:set_focus() end)
-            vim.keymap.set("n", "<S-enter>", function()
-                if tabs_controller.current_tab == 2 then
-                    env_tab.alternator = api.nvim_buf_get_name(0);
-                end
-            end);
-
-            vim.keymap.set("n", "<enter>", function()
-                if tabs_controller.current_tab == 1 then
-                    self:run_hurl();
-                else
-                    env_tab:select(api.nvim_buf_get_name(0));
-                    env_tab:buf_labels_refresh();
-                end
-            end, { silent = true });
-            self.inited = true
+                        self.inited = true
             self:update_win_size()
         end
     end,

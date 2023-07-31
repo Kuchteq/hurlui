@@ -3,6 +3,7 @@ local set_new_workspace_keybinding = function()
         api.nvim_win_close(0, true)
         local workstation_setup_modal = require("modals.worksetup")
         workstation_setup_modal:show()
+        api.nvim_feedkeys("i", "n", true) -- for whatever reason startinsert doesn't want to work
     end, { buffer = api.nvim_get_current_buf() })
 end
 return {
@@ -22,6 +23,7 @@ return {
                                 vim.keymap.set({ "n", "t" }, "<Tab>", function() require("tabs.controller"):shift() end);
                                 picker:init()
                             end
+                            vim.cmd.stopinsert()
                         end,
                     }
                 }
