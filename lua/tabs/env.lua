@@ -7,7 +7,6 @@ return {
     inited = true,
     paths = {}, -- nil means env has not yet been initialized,
     -- false directory is non existant and {} that there are no files in directory
-    env_editors = {},
     alternator = nil,
     alternator_select = function(self, path)
         self.alternator = path;
@@ -45,7 +44,7 @@ return {
     set_defaults = function(self)
         if self.paths then
             self.selected = u.tbl_first_string_with_substring(self.paths, DEFAULT_ENVSPACE_NAME);
-            self.alternator = #self.paths > 1 and u.first_not_present(self.paths, self.selected) or nil;
+            self.alternator = self.selected and #self.paths > 1 and u.first_not_present(self.paths, self.selected) or nil;
         end
     end,
     rescan = function(self)
@@ -53,18 +52,25 @@ return {
             local result = vim.fn.glob(vim.fn.getcwd() .. "/.envs/*")
             self.paths = result ~= "" and vim.split(result, '\n') or {}
         else
-            self.paths = false
+            self.paths = {}
         end
     end,
     enter = function(self, focus_on_name)
         -- Try out a new approach of relying solely on what neovim is doing
         self:rescan()
         api.nvim_set_current_tabpage(2)
+
+        -- If the user was at some workspace before, we need to clean up after than visit
+        local tabpage_visible_wins_info = u.tabpage_get_visible_wins_id_and_name(2)
+        local to_be_closed_wins_info = vim.tbl_filter(function(val)
+            return not vim.tbl_contains(self.paths, val.name) and  val.name ~= "" ;
+        end, tabpage_visible_wins_info)
         -- Since self.path saves using the full path name, we are checking if there is something that is not already present using the name
         local visible_window_paths = u.tabpage_get_bufs_names(2)
         local to_be_shown_window_paths = vim.tbl_filter(function(val)
             return not vim.tbl_contains(visible_window_paths, val);
         end, self.paths)
+
         for _, path in ipairs(to_be_shown_window_paths) do
             if api.nvim_buf_get_name(0) == "" then
                 vim.cmd.edit(path)
@@ -74,9 +80,12 @@ return {
             vim.bo.filetype = "sh"
             api.nvim_win_set_hl_ns(api.nvim_get_current_win(), ENV_EDITOR_NS);
         end
-        if focus_on_name then
-            u.set_win_focus_by_buf_name(focus_on_name)
+
+        for _, win in ipairs(to_be_closed_wins_info) do
+            vim.api.nvim_win_close(win.id, true)
         end
+
+
         self:buf_labels_refresh()
     end,
     add = function(self, name)

@@ -29,7 +29,7 @@ return {
     section_win_ids = nil,
     _add_callbacks = function(self, buf_id, enter_message)
         vim.keymap.set({ "i", "n" }, "<enter>", function() self:create() end, { buffer = buf_id })
-        vim.keymap.set({ "i", "n" }, "<c-c>", function() api.nvim_set_current_win(1000) end, { buffer = buf_id })
+        vim.keymap.set({ "i", "n" }, "<c-c>", function() self:hide() end, { buffer = buf_id })
         vim.keymap.set({ "i", "n" }, "<tab>", function() self:cycle() end, { buffer = buf_id })
         if enter_message then
             vim.api.nvim_create_autocmd({ "WinEnter" }, {
@@ -44,11 +44,10 @@ return {
         vim.api.nvim_create_autocmd({ "WinEnter" }, {
             callback = function()
                 if not vim.tbl_contains(self.section_win_ids, api.nvim_get_current_win()) then
-                    self:hide()
+                    pcall(function() self:hide()end)
                     return true
                 end
             end,
-            buffer = buf_id
         })
     end,
     show = function(self)
@@ -60,7 +59,8 @@ return {
         self.path.win_id = api.nvim_open_win(self.path.buf_id, false, self.path:get_build())
         vim.api.nvim_buf_set_lines(self.path.buf_id, 0, 1, true, { vim.fn.getcwd() })
         self.section_win_ids = { self.name.win_id, self.path.win_id }
-        self:_add_callbacks()
+        self:_add_callbacks(self.name.buf_id, "")
+        self:_add_callbacks(self.path.buf_id, "")
     end,
     cycle = function(self)
         local currently_on = api.nvim_get_current_win()

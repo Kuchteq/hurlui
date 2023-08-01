@@ -1,11 +1,11 @@
 ---@diagnostic disable-next-line: lowercase-global
 api = vim.api
 
-vim.keymap.set({ "n", "t" }, "r", ":qa!<CR>")
 -- Easier debugging
 P = function(a)
     print(vim.inspect(a))
 end
+--vim.keymap.set({ "n", "t" }, "r", ":qa!<CR>")
 
 -- CODE RELATED TO SEPERATING HURLUI FROM REGULAR NVIM
 local old_stdpath = vim.fn.stdpath

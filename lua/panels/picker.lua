@@ -8,6 +8,7 @@ local fileicon = "|"
 return {
     win = get_win_base(),
     dir_stack = {}, -- if there are no elements, it means the Picker is at $PWD
+    get_dir_string = function(self) return table.concat(self.dir_stack, "/") end,
     buf = {
         id = nil
     },
@@ -19,8 +20,16 @@ return {
             api.nvim_buf_set_name(self.buf.id, "Workspace")
             api.nvim_win_set_buf(self.win.id, self.buf.id)
             api.nvim_win_set_hl_ns(self.win.id, PICKER_NS)
+            api.nvim_buf_set_option(self.buf.id, "modifiable", false)
+            -- restrict keybindings so that the user doesn't get errors on accidental presses
+            vim.keymap.set("n", "a", "", { buffer = true })
+            vim.keymap.set("n", "i", "", { buffer = true })
+            vim.keymap.set("n", "I", "", { buffer = true })
+            vim.keymap.set("n", "A", "", { buffer = true })
+            vim.keymap.set("n", "o", "", { buffer = true })
+            vim.keymap.set("n", "O", "", { buffer = true })
             self:hide_cursor()
-            self:fetch_items("./")
+            self:fetch_items()
             self:draw()
 
             vim.keymap.set("n", "<enter>", function() self:open_cursor_entity() end, { buffer = true })
@@ -28,16 +37,10 @@ return {
             vim.keymap.set("n", "h", function() self:pop() end, { buffer = true })
             vim.keymap.set("n", "D", function() self:delete() end, { buffer = true })
             vim.keymap.set("n", "n", function() require("modals.request"):show() end, { buffer = true })
-            --
 
-            -- api.nvim_create_autocmd({ "ModeChangd" }, {
-            --     callback = function()
-            --         vim.cmd.stopinsert()
-            --     end,
-            --     buffer = self.buf.id
-            -- })
             api.nvim_create_autocmd({ "WinEnter" }, {
                 callback = function()
+                    vim.cmd.stopinsert()
                     self:hide_cursor()
                 end,
                 buffer = self.buf.id
@@ -72,11 +75,11 @@ return {
         }
     end,
     get_relative_path = function(self, item_name)
-        local path = table.concat(self.dir_stack, '/')
+        local path = self:get_dir_string()
         return path .. (#self.dir_stack > 0 and "/" or "") .. item_name
     end,
-    fetch_items = function(self, directory)
-        local dir_handle = vim.loop.fs_scandir(directory and directory or "./")
+    fetch_items = function(self)
+        local dir_handle = vim.loop.fs_scandir(#self.dir_stack > 0 and self:get_dir_string() or "./")
         if dir_handle then
             self.items = {}
             while true do
@@ -92,11 +95,15 @@ return {
         if not focus_object then
             focus_object = require("panels.editor").current_request_title
         end
+
         local parsed_file_titles = {};
         for _, item in ipairs(self.items) do
             table.insert(parsed_file_titles, item:get_display())
         end
+
+        api.nvim_buf_set_option(self.buf.id, "modifiable", true)
         api.nvim_buf_set_lines(self.buf.id, 0, -1, false, parsed_file_titles)
+        api.nvim_buf_set_option(self.buf.id, "modifiable", false)
         for i, item in ipairs(self.items) do
             if item.type == "file" then
                 api.nvim_buf_add_highlight(self.buf.id, PICKER_NS, "Error", i - 1, 0, #item.method + 1)
@@ -111,7 +118,7 @@ return {
         if not item then return end
 
         if item.type == "file" then
-            require("panels.editor"):receiveEditor(self:get_relative_path(item.name))
+            require("panels.editor"):receive_editor(self:get_relative_path(item.name))
         else
             table.insert(self.dir_stack, item.name);
             self:fetch_items(item.name)
@@ -119,14 +126,21 @@ return {
         end
     end,
     pop = function(self)
-        table.remove(self.dir_stack, #self.dir_stack)
-        self:fetch_items("./" .. table.concat(self.dir_stack, "/"))
-        self:draw()
+        local dir_to_focus = table.remove(self.dir_stack, #self.dir_stack)
+        self:fetch_items("./" .. self:get_dir_string())
+        self:draw(dir_to_focus)
     end,
     hide_cursor = function(self)
         if self.win.id == api.nvim_get_current_win() then
             vim.o.guicursor = "a:Cursor/lCursor"
         end
+    end,
+    --- Adds dir relative to the picker's dir
+    add_dir = function(self,name)
+        local new_dir_path = self:get_dir_string() .. "/" .. name
+        vim.fn.system("mkdir -p '" .. new_dir_path .. "'")
+        self:fetch_items()
+        self:draw(new_dir_path)
     end,
     delete = function(self)
         local item = self.items[api.nvim_win_get_cursor(0)[1]] -- the entries align perfectly with the cursor hence we can do it like that

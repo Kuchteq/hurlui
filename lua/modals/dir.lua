@@ -44,6 +44,7 @@ return {
             self.boot.buf_id = api.nvim_create_buf(false, true)
         end
         self.name.win_id = api.nvim_open_win(self.name.buf_id, true, self.name:get_build())
+        vim.cmd.startinsert()
         -- selfdraw_window(self.boot, false)
     end,
     hide = function(self)
@@ -51,12 +52,11 @@ return {
         -- api.nvim_win_hide(self.boot.win_id)
     end,
     create = function(self)
-        local new_dir_path = api.nvim_get_current_line()
+        local new_dir_name = api.nvim_get_current_line()
         api.nvim_del_current_line();
-        vim.fn.system("mkdir '" .. new_dir_path .. "'")
+        vim.fn.system("mkdir -p '" .. new_dir_name .. "'")
             self:hide();
-            picker_panel:fetch_items()
-            picker_panel:draw(new_dir_path)
+            picker_panel:add_dir(new_dir_name);
     end,
     cancel = function(self)
         api.nvim_del_current_line();

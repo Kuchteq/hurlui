@@ -16,11 +16,10 @@ Hurl is great but having an editor and terminal constantly open and having to sw
 
 # See it in action:
 script:
-enter and create a new workspace
-create a new env, add host
+enter and create add a new workspace named New Demo
+create a new request
+create a new env, add host jsonplaceholder.typicode.com
 jump back to runner, press rg enter and enter
-add parameter
-https://jsonplaceholder.typicode.com/posts
 add new parameter /{{which}}
 add new envspace
 add which variable to both
@@ -30,8 +29,13 @@ alternate
 run again
 create new subgroup
 make a new request there
-POST jwt (rp)
+write rp then /api/login
+write ab then Winston:bigbrother
+run query
 show jwt
+space w for new workspace
+open up and show how the old shitus is there
+
 
 # Superiority to other rest clients
 - No electron, forget about the start time or the 300 MB disk use. Hurlui can be ready to use in less than 25ms. 

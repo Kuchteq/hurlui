@@ -1,7 +1,6 @@
 local picker_panel = require("panels.picker")
 local editor_panel = require("panels.editor")
 local output_panel = require("panels.output")
-local tabs_controller = require("tabs.controller")
 local env_tab = require("tabs.env")
 
 return {
@@ -56,7 +55,7 @@ return {
         local appended_env_path = env_tab.selected and env_tab.selected or "";
         Job:new({
             command = 'executer',
-            args = { hurl_file_path, appended_env_path },
+            args = { hurl_file_path, vim.fn.getcwd(), appended_env_path },
         }):start()
         self.stopwatch.start_time = vim.loop.now()
         self.stopwatch:start_display()

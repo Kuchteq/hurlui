@@ -1,7 +1,8 @@
 #!/bin/sh
 
+# First argument's the file to run, second the workspace path, third the env var file
 [ ! -s "$1" ] && exit 1
-[ -s "$2" ] && [ -f "$2" ] && INCLUDED_ENVIRON="--variables-file '$2'"
+[ -s "$3" ] && [ -f "$3" ] && INCLUDED_ENVIRON="--variables-file '$3'"
 OUTPUT=$(eval "hurl --location $INCLUDED_ENVIRON -i '"$1"' 2>&1")
 HTTP_HEADERS=$(echo "$OUTPUT" | awk -v RS="" 'NR==1 {print $0}')
 RESPONSE_BODY=$(echo "$OUTPUT" | awk -v RS="" 'NR>1 {print $0}')
@@ -14,11 +15,10 @@ esac
 
 EXTENSION=$(echo "$RESPONSE_BODY" | file --mime-type -b - | sed 's/.*\///')
 
-BASENAME="${1##*/}" 
-BASENAME="${BASENAME%.*}"
-DESTFOLDER="$OUTPUT_BASE/$BASENAME"
+RELPATH=$(realpath --relative-to="$2" "$1")
+DESTFOLDER="$OUTPUT_BASE/${RELPATH%.*}"
 
-[ ! -d  "$DESTFOLDER" ] && mkdir "$DESTFOLDER"
+[ ! -d  "$DESTFOLDER" ] && mkdir -p "$DESTFOLDER"
 DEST="$DESTFOLDER/$(date +%H:%M:%SD%d-%m-%Y).$EXTENSION"
 
 if [ $EXTENSION = "json" ]; then
