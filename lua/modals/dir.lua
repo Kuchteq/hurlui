@@ -39,8 +39,8 @@ return {
     show = function(self)
         if not self.name.buf_id then
             self.name.buf_id = api.nvim_create_buf(true, true)
-            vim.keymap.set({"i", "n"}, "<enter>", function() self:create() end, { buffer = self.name.buf_id })
-            vim.keymap.set({ "n", "i" }, "<c-c>", function() self:cancel() end, {buffer= self.name.buf_id})
+            vim.keymap.set({ "i", "n" }, "<enter>", function() self:create() end, { buffer = self.name.buf_id })
+            vim.keymap.set({ "n", "i" }, "<c-c>", function() self:cancel() end, { buffer = self.name.buf_id })
             self.boot.buf_id = api.nvim_create_buf(false, true)
         end
         self.name.win_id = api.nvim_open_win(self.name.buf_id, true, self.name:get_build())
@@ -54,9 +54,8 @@ return {
     create = function(self)
         local new_dir_name = api.nvim_get_current_line()
         api.nvim_del_current_line();
-        vim.fn.system("mkdir -p '" .. new_dir_name .. "'")
-            self:hide();
-            picker_panel:add_dir(new_dir_name);
+        self:hide();
+        picker_panel:add_dir(new_dir_name);
     end,
     cancel = function(self)
         api.nvim_del_current_line();

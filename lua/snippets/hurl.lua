@@ -6,16 +6,16 @@ local t = ls.text_node
 
 return {
         s("rg", {
-            t("GET http://{{host}}/"),
+            t("GET https://{{host}}/"),
         }),
         s("rp", {
-            t("POST http://{{host}}/"),
+            t("POST https://{{host}}/"),
         }),
         s("rP", {
-            t("PUT http://{{host}}/"),
+            t("PUT https://{{host}}/"),
         }),
         s("rd", {
-            t("DELETE http://{{host}}/"),
+            t("DELETE https://{{host}}/"),
         }),
         s("au", {
             t("Authorization: "),

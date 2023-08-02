@@ -16,6 +16,7 @@ return {
                     hooks = {
                         open = function()
                             local picker = require("panels.picker")
+                            picker.dir_stack = {}
                             if picker.win.id then
                                 picker:fetch_items()
                                 picker:draw()

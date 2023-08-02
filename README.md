@@ -17,7 +17,7 @@ Hurl is great but having an editor and terminal constantly open and having to sw
 # See it in action:
 script:
 enter and create add a new workspace named New Demo
-create a new request
+create a new request - sample request
 create a new env, add host jsonplaceholder.typicode.com
 jump back to runner, press rg enter and enter
 add new parameter /{{which}}
@@ -27,9 +27,10 @@ come back to runner
 run again
 alternate
 run again
-create new subgroup
-make a new request there
-write rp then /api/login
+create new subgroup With Authorization
+make a new request there Get Auth
+write rp, change add /api/login change host to auth_host using ctrl w
+switch to env, write auth_host=hurlui.kuchta.dev
 write ab then Winston:bigbrother
 run query
 show jwt

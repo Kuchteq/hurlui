@@ -5,7 +5,7 @@ api = vim.api
 P = function(a)
     print(vim.inspect(a))
 end
---vim.keymap.set({ "n", "t" }, "r", ":qa!<CR>")
+vim.keymap.set({ "n", "t" }, "<c-s-q>", ":qa!<CR>")
 
 -- CODE RELATED TO SEPERATING HURLUI FROM REGULAR NVIM
 local old_stdpath = vim.fn.stdpath

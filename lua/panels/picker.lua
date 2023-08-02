@@ -93,7 +93,7 @@ return {
     end,
     draw = function(self, focus_object)
         if not focus_object then
-            focus_object = require("panels.editor").current_request_title
+            focus_object = vim.api.nvim_win_call(self.win.id, function() u.trunc_extension(vim.fn.expand('%:t')) end)
         end
 
         local parsed_file_titles = {};
@@ -136,11 +136,28 @@ return {
         end
     end,
     --- Adds dir relative to the picker's dir
-    add_dir = function(self,name)
-        local new_dir_path = self:get_dir_string() .. "/" .. name
+    add_dir = function(self, name)
+        local dir_string = self:get_dir_string()
+        local new_dir_path = (dir_string ~= "" and (dir_string .. "/") or "") .. name
         vim.fn.system("mkdir -p '" .. new_dir_path .. "'")
         self:fetch_items()
-        self:draw(new_dir_path)
+        self.win:set_focus()
+        self:draw(name)
+    end,
+    --- Adds dir relative to the picker's dir
+    add_request = function(self, name)
+        local dir_string = self:get_dir_string()
+        local new_request_filepath = (dir_string ~= "" and (dir_string .. "/") or "") .. name .. ".hurl"
+        local file, err = io.open(new_request_filepath, "w")
+        if not file then
+            -- If there was an error opening the file, handle the error
+            print("Error creating the file: " .. err)
+        else
+            file:close()
+            require("panels.editor"):receive_editor(new_request_filepath)
+            self:fetch_items()
+            self:draw()
+        end
     end,
     delete = function(self)
         local item = self.items[api.nvim_win_get_cursor(0)[1]] -- the entries align perfectly with the cursor hence we can do it like that

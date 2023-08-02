@@ -51,19 +51,11 @@ return {
         -- api.nvim_win_hide(self.boot.win_id)
     end,
     create = function(self)
-        local new_request_path = picker_panel:get_relative_path(api.nvim_get_current_line() .. ".hurl")
+        local name = api.nvim_get_current_line()
         api.nvim_del_current_line();
-        local file, err = io.open(new_request_path, "w")
-        if not file then
-            -- If there was an error opening the file, handle the error
-            print("Error creating the file: " .. err)
-        else
-            file:close()
-            self:hide();
-            editor_panel:receive_editor(new_request_path)
-            picker_panel:fetch_items()
-            picker_panel:draw()
-        end
+        self:hide();
+        require("panels.picker"):add_request(name)
+
     end,
     cancel = function(self)
         api.nvim_del_current_line();
