@@ -1,3 +1,7 @@
+<div align="center">
+    <img src="https://hurlui.kuchta.dev/Hui_logo.svg" height="100px" width="100px" alt="logo" />
+</div>
+
 # Hurlui - TUI API Debugging client based on Hurl and Neovim
 
 Hurl is great but having an editor and terminal constantly open and having to switch between them can be a bit unergonomic :/. This TUI client strives to provide excellent user experience via simplicity, ergonomic keybindings and the Neovim editor. The project is under constant development and can be considered as a semi-beta, so there are bugs out there as well as changes that will largely impact even the crucial features.
@@ -15,29 +19,7 @@ Hurl is great but having an editor and terminal constantly open and having to sw
 - Fast as hell
 
 # See it in action:
-script:
-enter and create add a new workspace named New Demo
-create a new request - sample request
-create a new env, add host jsonplaceholder.typicode.com
-jump back to runner, press rg enter and enter
-add new parameter /{{which}}
-add new envspace
-add which variable to both
-come back to runner
-run again
-alternate
-run again
-create new subgroup With Authorization
-make a new request there Get Auth
-write rp, change add /api/login change host to auth_host using ctrl w
-switch to env, write auth_host=hurlui.kuchta.dev
-write ab then Winston:bigbrother
-run query
-show jwt
-space w for new workspace
-open up and show how the old shitus is there
-
-
+[![asciicast](https://asciinema.org/a/600347.svg)](https://asciinema.org/a/600347)
 # Superiority to other rest clients
 - No electron, forget about the start time or the 300 MB disk use. Hurlui can be ready to use in less than 25ms. 
 - Powered by an actual CI/CD tool. Develop your queries within the project repo and easily keep them in sync with the rest.
