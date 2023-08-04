@@ -4,7 +4,7 @@
 
 # Hurlui - TUI API Debugging client based on Hurl and Neovim
 
-Hurl is great but having an editor and terminal constantly open and having to switch between them can be a bit unergonomic :/. This TUI client strives to provide excellent user experience via simplicity, ergonomic keybindings and the Neovim editor. The project is under constant development and can be considered as a semi-beta, so there are bugs out there as well as changes that will largely impact even the crucial features.
+[Hurl](https://github.com/Orange-OpenSource/hurl) is great but having an editor and terminal constantly open and having to switch between them can be a bit unergonomic :/. This TUI client strives to provide excellent user experience via simplicity, ergonomic keybindings and the Neovim editor. The project is under constant development and can be considered as a semi-beta, so there are bugs out there as well as changes that will largely impact even the crucial features. If you have never used hurl, fear not, essentially 95% of what you need to know is easily learnable in 5 minutes from their [excellent documentation](https://hurl.dev/docs/request.html) (in addition to in-editor snippets which offer help).
 
 # Features:
 - Workspaces
@@ -19,7 +19,8 @@ Hurl is great but having an editor and terminal constantly open and having to sw
 - Fast as hell
 
 # See it in action:
-[![asciicast](https://asciinema.org/a/600347.svg)](https://asciinema.org/a/600347)
+[![asciicast](https://asciinema.org/a/600691.svg)](https://asciinema.org/a/600691?speed=1.33)
+
 # Superiority to other rest clients
 - No electron, forget about the start time or the 300 MB disk use. Hurlui can be ready to use in less than 25ms. 
 - Powered by an actual CI/CD tool. Develop your queries within the project repo and easily keep them in sync with the rest.
@@ -27,17 +28,12 @@ Hurl is great but having an editor and terminal constantly open and having to sw
 - No unnecessary branding or buttons that you never touch.
 
 # Install guide (Linux)
-1. Install neovim, hurl and jq with the distro's package manager. (Optional) Install jwt-cli for JWT decoding.
+1. Install neovim, hurl and jq with the distro's package manager. (Optional) Install jwt-cli for JWT decoding. Most distros don't feautre hurl in the official repositories, hence you can get a precompiled binary at [Hurl's github](https://github.com/Orange-OpenSource/hurl#installation). 
 2. Clone repository wherever you want ``` git clone https://github.com/Kuchteq/hurlui.git && cd hurlui```
-3. Make sure hurlui and executer are executable. ```chmod u+x hurlui executer```
+3. Make sure hurlui and executer scripts are executable. ```chmod u+x hurlui executer```
 4. Run ./hurlui
 5. (Recommended) Add a symlink to path for easy access ``` ln -s "$PWD/hurlui" "~/.local/bin" ``` (or any place that suits you)
 6. (Optional) Change variables inside hurlui script. Add your preferred terminal inside HURLUI_TERM, change OUTPUT_BASE to a persistent location or change DEFAULT_ENVSPACE_NAME.
-
-# Install guide (Native Windows)
-There was very little testing done on Windows, and it can be a bad experience. For better experience, it is recommended to use WSL. 
-1. Clone repository ``` git clone https://github.com/Kuchteq/hurlui.git && cd hurlui```. 
-2. Inside powershell run ```.\installer.ps1```. The installer pulls the scoop package manager in case there isn't one and installs the dependencies. Next run hurlui.bat.
 
 # Keybindings
 Besides using standard neovim keybindings, Hurlui adds a couple of its own:

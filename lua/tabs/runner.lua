@@ -93,7 +93,7 @@ return {
         end
     end,
     status = {
-        text = "Welcome to hurlui, select a workspace, press <c-n> to initialise one or <c-s-n> to initialize at " .. vim.fn.getcwd() .. "  ",
+        text = "Welcome to hurlui, select a workspace or press <c-n> to create one at " .. vim.fn.getcwd() .. "  ",
         update = function(self, incoming)
             self.text = incoming;
         end
