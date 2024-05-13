@@ -1,35 +1,35 @@
 local u = require('utils')
 
 return {
-    current_tab = 1,
-    _boiler_line_prepare = function(self, num)
-        return '%' .. num .. 'T' .. (num == self.current_tab and '%#TabLineSel# ' or '%#TabLine# ')
-    end,
-    urgent_status = nil,
-    get_line = function(self)
-        -- Runner always has the tabId of 1 and env page 2
-        local env_tab = require("tabs.env")
-        local runner_tab = require("tabs.runner")
-        self.current_tab = vim.fn.tabpagenr()
-        -- tab_info is essentially what is displayed on the left
-        local tab_info = self:_boiler_line_prepare(1) .. "Runner ";
-        tab_info = tab_info .. self:_boiler_line_prepare(2) .. env_tab:get_tabline_name() .. " %#TabLineFill#%=";      -- %= gives the alignment to right
-        local env_info = env_tab.selected and "%#EnvBarFill# env: " .. u.get_file_name(env_tab.selected) .. " " or ''; -- Env info expects path
-        return tab_info .. (self.urgent_status and self.urgent_status
-            or (self.current_tab == 1 and runner_tab.status.text or env_tab.status.text) .. env_info);
-    end,
-    shift = function(self)
-        local env_tab = require("tabs.env")
-        local runner_tab = require("tabs.runner")
-        self.current_tab = vim.fn.tabpagenr();
-        if self.current_tab == 1 then
-            env_tab:enter()
-        else
-            vim.cmd.tabprevious()
+        current_tab = 1,
+        _boiler_line_prepare = function(self, num)
+                return '%' .. num .. 'T' .. (num == self.current_tab and '%#TabLineSel# ' or '%#TabLine# ')
+        end,
+        urgent_status = nil,
+        get_line = function(self)
+                -- Runner always has the tabId of 1 and env page 2
+                local env_tab = require("tabs.env")
+                local runner_tab = require("tabs.runner")
+                self.current_tab = vim.fn.tabpagenr()
+                -- tab_info is essentially what is displayed on the left
+                local tab_info = self:_boiler_line_prepare(1) .. "Runner ";
+                tab_info = tab_info .. self:_boiler_line_prepare(2) .. env_tab:get_tabline_name() .. " %#TabLineFill#%="; -- %= gives the alignment to right
+                local env_info = env_tab.selected and "%#EnvBarFill# env: " .. u.get_file_name(env_tab.selected) .. " " or ''; -- Env info expects path
+                return tab_info .. (self.urgent_status and self.urgent_status
+                        or (self.current_tab == 1 and runner_tab.status.text or env_tab.status.text) .. env_info);
+        end,
+        shift = function(self)
+                local env_tab = require("tabs.env")
+                local runner_tab = require("tabs.runner")
+                P(api.nvim_tabpage_get_var(0, "purpose"))
+                if api.nvim_tabpage_get_var(0, "purpose") == "runner" then
+                        env_tab:enter()
+                else
+                        runner_tab:enter()
+                end
+                self:redraw_line()
+        end,
+        redraw_line = function()
+                vim.cmd.redrawtabline()
         end
-        self:redraw_line()
-    end,
-    redraw_line = function()
-        vim.cmd.redrawtabline()
-    end
 }

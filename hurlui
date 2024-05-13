@@ -16,4 +16,4 @@ export LISTEN_ADDRESS="$XDG_RUNTIME_DIR/hurlui.$RANDOM"
 
 [ ! -d "$OUTPUT_BASE" ] && mkdir "$OUTPUT_BASE"
 
-$HURLUI_TERM nvim -u $HURLUI_HOME/init.lua --listen $LISTEN_ADDRESS $@
+$HURLUI_TERM nvim -u $HURLUI_HOME/init.lua --listen $LISTEN_ADDRESS "${@}"

@@ -50,14 +50,21 @@ return {
             end,
         })
     end,
-    show = function(self)
+    show = function(self, init_name, init_path)
         if not self.name then
             self.name = get_sample_modal("< New workspace name >", 1, 0, 51)
             self.path = get_sample_modal("< At path >", 1, 2, 52)
         end
         self.name.win_id = api.nvim_open_win(self.name.buf_id, true, self.name:get_build())
         self.path.win_id = api.nvim_open_win(self.path.buf_id, false, self.path:get_build())
-        vim.api.nvim_buf_set_lines(self.path.buf_id, 0, 1, true, { vim.fn.getcwd() })
+        if init_name then
+                vim.api.nvim_buf_set_lines(self.name.buf_id, 0, 1, true, { init_name })
+        end
+        if init_path then
+                vim.api.nvim_buf_set_lines(self.path.buf_id, 0, 1, true, { init_path})
+        else
+                vim.api.nvim_buf_set_lines(self.path.buf_id, 0, 1, true, { vim.fn.getcwd() })
+        end
         self.section_win_ids = { self.name.win_id, self.path.win_id }
         self:_add_callbacks(self.name.buf_id, "")
         self:_add_callbacks(self.path.buf_id, "")
@@ -81,7 +88,10 @@ return {
     create = function(self)
         local name = vim.api.nvim_buf_get_lines(self.name.buf_id, 0, 1, true)[1]
         local path = vim.api.nvim_buf_get_lines(self.path.buf_id, 0, 1, true)[1]
-        require("workspaces").add(name, path)
+        if vim.fn.isdirectory(path) then
+                vim.fn.system("mkdir -p '" .. path .. "'")
+        end
+        require("workspaces").add(path, name)
         require("workspaces").open(name)
     end,
     cancel = function(self)

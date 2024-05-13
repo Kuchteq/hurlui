@@ -2,8 +2,10 @@
 
 # First argument's the file to run, second the workspace path, third the env var file
 [ ! -s "$1" ] && exit 1
-[ -s "$3" ] && [ -f "$3" ] && INCLUDED_ENVIRON="--variables-file '$3'"
-OUTPUT=$(eval "hurl --location $INCLUDED_ENVIRON -i '"$1"' 2>&1")
+[ -s "$3" ] && [ -f "$3" ] && ENVIRON_FLAG=--variables-file && INCLUDED_ENVIRON="$3" 
+included="$(grep "^#include " "$1" | sed "s/^#include //")"
+[ -z "$included" ] || [ -f "$included.hurl" ] || notify-send " File $included not included" "No such file 󱀷 "
+OUTPUT=$(cat "$included.hurl" "$1" | hurl -L ${ENVIRON_FLAG:+"$ENVIRON_FLAG"} ${INCLUDED_ENVIRON:+"$INCLUDED_ENVIRON"} -i 2>&1)
 HTTP_HEADERS=$(echo "$OUTPUT" | awk -v RS="" 'NR==1 {print $0}')
 RESPONSE_BODY=$(echo "$OUTPUT" | awk -v RS="" 'NR>1 {print $0}')
 FIRST_LINE=$(echo "$HTTP_HEADERS" | awk 'NR==1 {print}')

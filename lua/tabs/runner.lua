@@ -6,6 +6,13 @@ local env_tab = require("tabs.env")
 return {
     inited = false,
     is_smaller = false,
+    get_tabpage = function ()
+            for _, tabpage in ipairs(api.nvim_list_tabpages()) do
+                if api.nvim_tabpage_get_var(tabpage, "purpose") == "runner" then
+                        return tabpage
+                end;
+            end
+    end,
     update_win_size = function(self)
         if self.inited then
             local nvim_width = vim.go.columns;
@@ -78,7 +85,7 @@ return {
     },
     -- We should probably seperate init from enter
     enter = function(self)
-        vim.api.nvim_set_current_tabpage(1)
+        vim.api.nvim_set_current_tabpage(self.get_tabpage())
         if not self.inited then
             vim.cmd.vsplit()
             editor_panel.win.id = api.nvim_get_current_win();

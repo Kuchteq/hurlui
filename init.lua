@@ -44,7 +44,6 @@ vim.o.cursorline = true
 vim.o.titlestring = 'Hurlui'
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
-vim.o.noshowcmd = 1
 vim.opt.showtabline = 2
 vim.opt.fillchars = { eob = " " }
 vim.opt.shortmess:append({ I = true })
@@ -58,6 +57,10 @@ vim.opt.statusline = "%= %t %="                    -- Center the bottom status l
 vim.opt.undodir = { vim.fn.stdpath('cache') .. "/hurly/.undodir" } -- set up undodir
 vim.opt.undofile = true
 vim.o.splitright = true;
+vim.api.nvim_tabpage_set_var(0, "purpose", "runner")
+vim.cmd.tabnew()
+vim.api.nvim_tabpage_set_var(0, "purpose", "env")
+vim.cmd.tabprevious()
 
 require("theme")
 require("modals.jwt")
@@ -75,7 +78,7 @@ vim.keymap.set({ "i", "n" }, "<c-s-e>", function() if require("panels.picker").w
 vim.keymap.set("n", "<leader>a", function() require("tabs.env"):alternate(); end);
 vim.keymap.set("n", "<S-enter>", function()
     local env_tab = require("tabs.env")
-    if api.nvim_get_current_tabpage() == 2 then
+    if api.nvim_get_current_tabpage() ==  env_tab.get_tabpage() then
         env_tab:alternator_select(api.nvim_buf_get_name(0));
     end
 end);
@@ -83,7 +86,7 @@ end);
 vim.keymap.set("n", "<enter>", function()
     local runner_tab = require("tabs.runner")
     local env_tab = require("tabs.env")
-    if api.nvim_get_current_tabpage() == 1 then
+    if api.nvim_get_current_tabpage() == runner_tab.get_tabpage() then
         runner_tab:run_hurl();
     else
         env_tab:select(api.nvim_buf_get_name(0));
@@ -123,9 +126,6 @@ api.nvim_create_autocmd({ "VimResized" }, {
         end
     end
 })
-
-vim.cmd.tabnew()
-vim.cmd.tabprevious()
 require("modals.envsetup")
 
 TABLINE_UPDATE = function()

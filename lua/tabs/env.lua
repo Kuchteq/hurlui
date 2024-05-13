@@ -8,6 +8,13 @@ return {
     paths = {}, -- nil means env has not yet been initialized,
     -- false directory is non existant and {} that there are no files in directory
     alternator = nil,
+    get_tabpage = function ()
+            for _, tabpage in ipairs(api.nvim_list_tabpages()) do
+                if api.nvim_tabpage_get_var(tabpage, "purpose") == "env" then
+                        return tabpage
+                end;
+            end
+    end,
     alternator_select = function(self, path)
         self.alternator = path;
         self:buf_labels_refresh()
@@ -58,7 +65,7 @@ return {
     enter = function(self, focus_on_name)
         -- Try out a new approach of relying solely on what neovim is doing
         self:rescan()
-        api.nvim_set_current_tabpage(2)
+        api.nvim_set_current_tabpage(self.get_tabpage())
 
         -- If the user was at some workspace before, we need to clean up after than visit
         local tabpage_visible_wins_info = u.tabpage_get_visible_wins_id_and_name(2)
@@ -66,7 +73,7 @@ return {
             return not vim.tbl_contains(self.paths, val.name) and  val.name ~= "" ;
         end, tabpage_visible_wins_info)
         -- Since self.path saves using the full path name, we are checking if there is something that is not already present using the name
-        local visible_window_paths = u.tabpage_get_bufs_names(2)
+        local visible_window_paths = u.tabpage_get_bufs_names(self.get_tabpage())
         local to_be_shown_window_paths = vim.tbl_filter(function(val)
             return not vim.tbl_contains(visible_window_paths, val);
         end, self.paths)
@@ -100,7 +107,7 @@ return {
         end
     end,
     buf_labels_refresh = function(self)
-        for _, win_id in ipairs(api.nvim_tabpage_list_wins(2)) do
+        for _, win_id in ipairs(api.nvim_tabpage_list_wins(self.get_tabpage())) do
             local buf_name = u.get_buf_name_by_win_id(win_id)
             local title = "%= %t %=";
             if self.selected and self.selected == buf_name then
