@@ -8,7 +8,7 @@ set_new_workspace = function(init_name, init_path)
 end
 
 local set_new_workspace_keybinding = function()
-        vim.keymap.set({ "i", "n" }, "<c-n>", set_new_workspace, { buffer = api.nvim_get_current_buf() })
+        vim.keymap.set({ "i", "n" }, "<c-n>", function() api.nvim_win_close(0,true); set_new_workspace("", vim.fn.getcwd().."/.hurl") end, { buffer = api.nvim_get_current_buf() })
 end
 
 return {
